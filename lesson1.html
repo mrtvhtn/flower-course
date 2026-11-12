@@ -1,512 +1,119 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Урок 1: Инженерия Венерина Башмачка (RU / FR / EN)</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #12151c;
-            color: #f0f4f8;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        header {
-            width: 100%;
-            padding: 15px 30px;
-            background: #1a1f2b;
-            border-bottom: 1px solid #2d3548;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        h1 {
-            margin: 0;
-            font-size: 19px;
-            color: #ffd166;
-            letter-spacing: 0.5px;
-        }
-        .subtitle {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-top: 3px;
-        }
-        .lang-switch {
-            display: flex;
-            gap: 8px;
-        }
-        .lang-btn {
-            background: #232a3b;
-            color: #cbd5e1;
-            border: 1px solid #3e4b66;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .lang-btn:hover {
-            border-color: #ffd166;
-        }
-        .lang-btn.active-lang {
-            background: #06d6a0;
-            color: #12151c;
-            border-color: #06d6a0;
-        }
-        .main-container {
-            display: flex;
-            flex: 1;
-            width: 100%;
-            max-width: 1300px;
-            padding: 20px;
-            gap: 20px;
-            box-sizing: border-box;
-        }
-        .canvas-box {
-            flex: 2;
-            background: #181c26;
-            border-radius: 16px;
-            border: 1px solid #2d3548;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 16px;
-        }
-        .controls-box {
-            flex: 1;
-            background: #1a1f2b;
-            border-radius: 16px;
-            border: 1px solid #2d3548;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .step-info {
-            background: #232a3b;
-            padding: 18px;
-            border-radius: 12px;
-            border-left: 4px solid #ffd166;
-            margin-bottom: 20px;
-        }
-        .step-title {
-            font-size: 17px;
-            font-weight: bold;
-            color: #ffd166;
-            margin-bottom: 8px;
-        }
-        .step-desc {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #cbd5e1;
-        }
-        .physics-tag {
-            display: inline-block;
-            background: rgba(6, 214, 160, 0.15);
-            color: #06d6a0;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .stage-btn {
-            background: #2b3448;
-            color: #fff;
-            border: 1px solid #3e4b66;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .stage-btn:hover {
-            background: #37435c;
-            border-color: #ffd166;
-        }
-        .stage-btn.active {
-            background: #ffd166;
-            color: #12151c;
-            font-weight: bold;
-            border-color: #ffd166;
-        }
-        .toggle-btn {
-            background: #06d6a0;
-            color: #12151c;
-            border: none;
-            padding: 13px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        .toggle-btn:hover {
-            background: #05b889;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 1: Венерин башмачок</title>
+  <style>
+    body { margin: 0; padding: 16px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    h2 { color: #fde047; font-size: 20px; margin: 0 0 12px; }
+    canvas { background: #1e293b; border: 2px solid #334155; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px 0; }
+    button { padding: 14px 18px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #facc15; color: #0f172a; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #facc15; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 15px; line-height: 1.4; }
+  </style>
 </head>
 <body>
-
-<header>
-    <div>
-        <h1 id="mainTitle">🔬 ИНЖЕНЕРИЯ ЦВЕТОВ: Венерин башмачок (Cypripedium calceolus)</h1>
-        <div class="subtitle" id="subTitle">Интерактивная модель для видеоурока • Разрез губы и траектория опыления</div>
-    </div>
-    <div class="lang-switch">
-        <button class="lang-btn active-lang" onclick="setLang('ru', this)">RU</button>
-        <button class="lang-btn" onclick="setLang('fr', this)">FR</button>
-        <button class="lang-btn" onclick="setLang('en', this)">EN</button>
-    </div>
-</header>
-
-<div class="main-container">
-    <div class="canvas-box">
-        <canvas id="flowerCanvas" width="800" height="580"></canvas>
-    </div>
-
-    <div class="controls-box">
-        <div>
-            <div class="step-info">
-                <div class="step-title" id="stepTitle"></div>
-                <div class="step-desc" id="stepDesc"></div>
-                <div class="physics-tag" id="physicsTag"></div>
-            </div>
-
-            <div class="btn-group">
-                <button class="stage-btn active" id="btn0" onclick="setStage(0, this)"></button>
-                <button class="stage-btn" id="btn1" onclick="setStage(1, this)"></button>
-                <button class="stage-btn" id="btn2" onclick="setStage(2, this)"></button>
-                <button class="stage-btn" id="btn3" onclick="setStage(3, this)"></button>
-            </div>
-        </div>
-
-        <button class="toggle-btn" id="xrayBtn" onclick="toggleXray()"></button>
-    </div>
-</div>
+  <h2>🌸 Урок 1: Ловушка Венерина башмачка</h2>
+  <canvas id="c" width="420" height="320"></canvas>
+  <div class="btns">
+    <button class="b1" onclick="goBee()">🐝 1. Запустить шмеля</button>
+    <button class="b2" onclick="goLight()">💡 2. Световой маяк</button>
+    <button class="b3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Нажми «Запустить шмеля», чтобы проверить, как работает скользкая ловушка цветка.</div>
 
 <script>
-    const canvas = document.getElementById('flowerCanvas');
-    const ctx = canvas.getContext('2d');
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+  let state = 'idle', light = false, p = 0, bee = { x: 70, y: 50, pollen: false };
 
-    let currentLang = 'ru';
-    let stage = 0;
-    let xray = true;
-    let time = 0;
-    let bee = { x: 200, y: 120, hasPollen: false };
+  function goBee() {
+    bee = { x: 70, y: 50, pollen: false };
+    state = 'fall'; p = 0;
+    msg.innerText = '🐝 Шмель прилетел на запах, поскользнулся на восковом крае и упал внутрь!';
+  }
 
-    const translations = {
-        ru: {
-            mainTitle: "🔬 ИНЖЕНЕРИЯ ЦВЕТОВ: Венерин башмачок (Cypripedium calceolus)",
-            subTitle: "Интерактивная модель для видеоурока • Разрез губы и траектория опыления",
-            xrayBtn: "🔍 Включить / Выключить разрез стенки",
-            labelPistil: "1. Пестик",
-            labelAnther: "2. Пыльник",
-            labelRim: "Загнутый край (выхода нет)",
-            buttons: [
-                "Этап 1: Общий вид и бордовые ленты",
-                "Этап 2: Падение в ловушку (Трение = 0)",
-                "Этап 3: Световые окошки (Оптика)",
-                "Этап 4: Контакт с пестиком и пыльцой"
-            ],
-            stages: [
-                {
-                    title: "1. Внешняя архитектура и приманка",
-                    desc: "Ярко-жёлтая чаша (губа) и контрастные бордовые лепестки привлекают пчелу. Растение выделяет эфиры, имитирующие запах нектара и феромоны.",
-                    tag: "Химия запахов + Зеркальная симметрия"
-                },
-                {
-                    title: "2. Скользкие стенки и загнутый край",
-                    desc: "Пчела садится на край и падает внутрь. Клетки внутри покрыты гладким воском: сила трения исчезает. Края загнуты внутрь — вылететь вверх невозможно!",
-                    tag: "Физика: Коэффициент трения и геометрия"
-                },
-                {
-                    title: "3. Оптический маяк (Световые окошки)",
-                    desc: "В глубине башмачка темно, но у основания есть два полупрозрачных окошка. Свет преломляется сквозь лепесток, и пчела ползёт на свет в узкий тоннель.",
-                    tag: "Физика: Оптика и преломление света"
-                },
-                {
-                    title: "4. Механика выхода и опыление",
-                    desc: "Протискиваясь к выходу, пчела сначала задевает спинкой пестик (оставляя старую пыльцу), а затем касается пыльника и получает новую порцию золота!",
-                    tag: "Механика: Точный контакт"
-                }
-            ]
-        },
-        fr: {
-            mainTitle: "🔬 INGÉNIERIE DES FLEURS : Sabot de Vénus (Cypripedium calceolus)",
-            subTitle: "Modèle interactif pour le cours • Coupe du labelle et trajectoire de pollinisation",
-            xrayBtn: "🔍 Activer / Désactiver la vue en coupe",
-            labelPistil: "1. Pistil",
-            labelAnther: "2. Anthère",
-            labelRim: "Bord replié (sans issue)",
-            buttons: [
-                "Étape 1 : Architecture et rubans bordeaux",
-                "Étape 2 : Chute dans le piège (Frottement = 0)",
-                "Étape 3 : Fenêtres lumineuses (Optique)",
-                "Étape 4 : Contact avec le pistil et le pollen"
-            ],
-            stages: [
-                {
-                    title: "1. Architecture externe et leurre chimique",
-                    desc: "La coupe jaune vif (labelle) et les pétales bordeaux attirent l'abeille. La fleur synthétise des esters imitant l'odeur du nectar et des phéromones.",
-                    tag: "Chimie des odeurs + Symétrie bilatérale"
-                },
-                {
-                    title: "2. Parois glissantes et bord replié",
-                    desc: "L'abeille se pose et glisse au fond : la cire réduit le coefficient de frottement à zéro. Les bords repliés vers l'intérieur empêchent tout envol vertical.",
-                    tag: "Physique : Frottement et géométrie"
-                },
-                {
+  function goLight() {
+    light = !light;
+    if (light && state === 'trap') {
+      state = 'climb'; p = 0;
+      msg.innerText = '💡 Свет включён! Шмель увидел прозрачные окошки и ползёт к выходу мимо пыльцы!';
+    }
+  }
 
+  function reset() {
+    state = 'idle'; light = false; p = 0; bee = { x: 70, y: 50, pollen: false };
+    msg.innerText = 'Опыт сброшен. Нажми «Запустить шмеля».';
+  }
 
-title: "3. Phare optique (Fenêtres lumineuses)",
-desc: "Dans la pénombre du fond, deux zones translucides laissent passer la lumière du soleil. Guidée par phototactisme, l'abeille rampe vers la lumière.",
-tag: "Physique : Optique et réfraction"
-},
-{
-title: "4. Mécanique de sortie et pollinisation",
-desc: "Dans l'étroit couloir de sortie, le dos de l'abeille frotte d'abord le pistil (déposant l'ancien pollen), puis l'anthère qui la charge de nouveau pollen !",
-tag: "Mécanique : Contact de précision"
-}
-]
-},
-en: {
-mainTitle: "🔬 FLOWER ENGINEERING: Lady's Slipper (Cypripedium calceolus)",
-subTitle: "Interactive Lesson Model • Labellum Cross-Section & Pollination Path",
-xrayBtn: "🔍 Toggle Cross-Section View",
-labelPistil: "1. Pistil",
-labelAnther: "2. Anther",
-labelRim: "Inward rim (no exit)",
-buttons: [
-"Stage 1: Outer Architecture & Maroon Ribbons",
-"Stage 2: Falling into the Trap (Friction = 0)",
-"Stage 3: Light Windows (Optics)",
-"Stage 4: Contact with Pistil and Pollen"
-],
-stages: [
-{
-title: "1. Outer Architecture and Chemical Lure",
-desc: "The bright yellow pouch (labellum) and maroon petals attract the bee. The plant synthesizes volatile esters mimicking nectar and bee pheromones.",
-tag: "Chemistry of Scents + Bilateral Symmetry"
-},
-{
-title: "2. Slippery Walls and Inward Rim",
-desc: "The bee lands and slips inside: waxy walls drop friction near zero. Inward-curving edges prevent the bee from spreading its wings to fly straight up.",
-tag: "Physics: Friction Coefficient & Geometry"
-},
-{
-title: "3. Optical Beacon (Light Windows)",
-desc: "Inside the dim pouch, two translucent patches at the base refract sunlight. Driven by positive phototaxis, the bee crawls up toward the light.",
-tag: "Physics: Optics & Light Refraction"
-},
-{
-title: "4. Exit Mechanics and Pollination",
-desc: "Squeezing through the narrow exit tunnel, the bee's back brushes the green pistil first (leaving old pollen), then touches the red anther for fresh pollen!",
-tag: "Mechanics: Precision Contact"
-}
-]
-}
-};
-function updateUI() {
-const t = translations[currentLang];
-document.getElementById('mainTitle').innerText = t.mainTitle;
-document.getElementById('subTitle').innerText = t.subTitle;
-document.getElementById('xrayBtn').innerText = t.xrayBtn;
-for (let i = 0; i < 4; i++) {
-document.getElementById('btn' + i).innerHTML = <span>${t.buttons[i]}</span><span>→</span>;
-}
-document.getElementById('stepTitle').innerText = t.stages[stage].title;
-document.getElementById('stepDesc').innerText = t.stages[stage].desc;
-document.getElementById('physicsTag').innerText = t.stages[stage].tag;
-}
-function setLang(lang, btnElement) {
-currentLang = lang;
-document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active-lang'));
-btnElement.classList.add('active-lang');
-updateUI();
-}
-function setStage(newStage, btnElement) {
-stage = newStage;
-document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('active'));
-btnElement.classList.add('active');
-updateUI();
-time = 0;
-}
-function toggleXray() {
-xray = !xray;
-}
-function drawFlower() {
-const t = translations[currentLang];
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-ctx.lineWidth = 1;
-for (let i = 0; i < canvas.width; i += 40) {
-ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-}
-for (let j = 0; j < canvas.height; j += 40) {
-ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
-}
-ctx.strokeStyle = '#2d6a4f';
-ctx.lineWidth = 10;
-ctx.beginPath();
-ctx.moveTo(580, 580);
-ctx.quadraticCurveTo(590, 350, 530, 220);
-ctx.stroke();
-ctx.fillStyle = '#590d22';
-ctx.beginPath();
-ctx.moveTo(530, 220);
-ctx.quadraticCurveTo(480, 80, 410, 50);
-ctx.quadraticCurveTo(520, 110, 550, 215);
-ctx.fill();
+  function loop() {
+    ctx.clearRect(0, 0, 420, 320);
 
-ctx.beginPath();
-ctx.moveTo(520, 225);
-ctx.bezierCurveTo(350, 210, 220, 310, 130, 280);
-ctx.bezierCurveTo(230, 330, 360, 240, 520, 240);
-ctx.fill();
-ctx.beginPath();
-ctx.moveTo(550, 230);
-ctx.bezierCurveTo(680, 250, 720, 380, 760, 420);
-ctx.bezierCurveTo(700, 390, 650, 270, 545, 245);
-ctx.fill();
-ctx.save();
-ctx.beginPath();
-ctx.moveTo(480, 230);
-ctx.bezierCurveTo(350, 230, 250, 320, 280, 410);
-ctx.bezierCurveTo(310, 490, 500, 470, 540, 350);
-ctx.bezierCurveTo(560, 290, 550, 240, 520, 230);
-ctx.closePath();
+    // Стебель и лепестки
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(210, 320); ctx.lineTo(210, 120); ctx.stroke();
 
-if (xray) {
-ctx.fillStyle = 'rgba(255, 209, 102, 0.22)';
-ctx.fill();
-ctx.strokeStyle = '#ffd166';
-ctx.lineWidth = 3;
-ctx.stroke();
-} else {
-let grad = ctx.createLinearGradient(280, 230, 540, 450);
-grad.addColorStop(0, '#ffd166');
-grad.addColorStop(1, '#f4a261');
-ctx.fillStyle = grad;
-ctx.fill();
-ctx.strokeStyle = '#e76f51';
-ctx.lineWidth = 2;
-ctx.stroke();
-}
-ctx.restore();
-ctx.strokeStyle = '#ff9f1c';
-ctx.lineWidth = 5;
-ctx.beginPath();
-ctx.moveTo(480, 230);
-ctx.quadraticCurveTo(420, 245, 390, 265);
-ctx.stroke();
-ctx.fillStyle = stage === 2 ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.35)';
-ctx.beginPath();
-ctx.ellipse(515, 310, 12, 22, -0.3, 0, Math.PI * 2);
-ctx.fill();
-if (stage === 2) {
-ctx.strokeStyle = 'rgba(255, 255, 200, 0.6)';
-ctx.lineWidth = 2;
-ctx.beginPath();
-ctx.moveTo(515, 310); ctx.lineTo(410, 360);
-ctx.moveTo(515, 310); ctx.lineTo(430, 390);
-ctx.stroke();
-}
+    ctx.fillStyle = '#7f1d1d';
+    ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(100, 100, 40, 160); ctx.quadraticCurveTo(120, 130, 210, 140); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(320, 100, 380, 160); ctx.quadraticCurveTo(300, 130, 210, 140); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(180, 40, 210, 20); ctx.quadraticCurveTo(240, 40, 210, 125); ctx.fill();
 
-if (xray) {
-ctx.fillStyle = '#06d6a0';
-ctx.beginPath();
-ctx.arc(495, 275, 9, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = '#fff';
-ctx.font = '13px sans-serif';
-ctx.fillText(t.labelPistil, 410, 278);
-ctx.fillStyle = '#ef476f';
-ctx.beginPath();
-ctx.arc(525, 250, 9, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = '#fff';
-ctx.fillText(t.labelAnther, 542, 253);
-ctx.fillStyle = '#ffd166';
-ctx.fillText(t.labelRim, 225, 215);
-}
-}
-function drawBee(x, y, hasPollen) {
-ctx.save();
-ctx.translate(x, y);
-ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-let wingOffset = Math.sin(time * 0.5) * 4;
-ctx.beginPath();
-ctx.ellipse(-2, -10 + wingOffset, 10, 5, -0.4, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = '#ffb703';
-ctx.beginPath();
-ctx.ellipse(0, 0, 14, 9, 0, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = '#023047';
-ctx.fillRect(-5, -8, 3, 16);
-ctx.fillRect(2, -8, 3, 16);
-if (hasPollen) {
-ctx.fillStyle = '#ef476f';
-ctx.beginPath();
-ctx.arc(0, -9, 5, 0, Math.PI * 2);
-ctx.fill();
-}
-ctx.restore();
-}
-function updateAndRender() {
-time += 0.05;
-drawFlower();
-if (stage === 0) {
-bee.x = 240 + Math.sin(time) * 30;
-bee.y = 140 + Math.cos(time * 1.5) * 15;
-bee.hasPollen = false;
-} else if (stage === 1) {
-let progress = Math.min(1, time / 4);
-bee.x = 430 - progress * 80;
-bee.y = 220 + progress * 170;
-bee.hasPollen = false;
-} else if (stage === 2) {
-let progress = Math.min(1, time / 4);
-bee.x = 350 + progress * 130;
-bee.y = 390 - progress * 55;
-bee.hasPollen = false;
-} else if (stage === 3) {
-let progress = Math.min(1, time / 5);
-bee.x = 480 + progress * 80;
-bee.y = 335 - progress * 150;
-if (progress > 0.45) bee.hasPollen = true;
-}
-drawBee(bee.x, bee.y, bee.hasPollen);
-requestAnimationFrame(updateAndRender);
-}
-updateUI();
-updateAndRender();
+    // Световой маяк
+    if (light) {
+      ctx.fillStyle = 'rgba(253, 224, 71, 0.45)';
+      ctx.beginPath(); ctx.arc(270, 130, 55, 0, Math.PI * 2); ctx.fill();
+    }
 
+    // Пыльца
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath(); ctx.arc(250, 138, 8, 0, Math.PI * 2); ctx.fill();
 
+    // Жёлтая губа-ловушка
+    ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
+    ctx.beginPath();
+    ctx.moveTo(160, 145);
+    ctx.bezierCurveTo(120, 200, 140, 280, 210, 280);
+    ctx.bezierCurveTo(280, 280, 300, 190, 260, 130);
+    ctx.lineTo(235, 135);
+    ctx.quadraticCurveTo(240, 165, 205, 165);
+    ctx.closePath(); ctx.fill();
 
-  
+    // Движение шмеля
+    if (state === 'fall') {
+      p += 0.02; bee.x = 70 + p * 140; bee.y = 50 + p * 180;
+      if (p >= 1) {
+        state = 'trap';
+        msg.innerText = '⚠️ Шмель в ловушке! Стенки скользкие. Нажми «Световой маяк», чтобы показать выход.';
+      }
+    } else if (state === 'trap') {
+      bee.x = 210 + Math.sin(Date.now() / 120) * 15; bee.y = 230;
+      if (light) { state = 'climb'; p = 0; }
+    } else if (state === 'climb') {
+      p += 0.015; bee.x = 210 + p * 60; bee.y = 230 - p * 100;
+      if (p > 0.5) bee.pollen = true;
+      if (p >= 1) {
+        state = 'done';
+        msg.innerText = '✅ Готово! Шмель вылетел с пыльцой на спинке без единой капли нектара!';
+      }
+    } else if (state === 'done') {
+      bee.x += 1.5; bee.y -= 0.7;
+      if (bee.x > 440) bee.x = 290;
+    }
+
+    // Рисуем шмеля
+    ctx.save(); ctx.translate(bee.x, bee.y);
+    ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.ellipse(0, 0, 13, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -7, 4, 14); ctx.fillRect(2, -7, 4, 14);
+    if (bee.pollen) { ctx.fillStyle = '#fb923c'; ctx.beginPath(); ctx.arc(0, -8, 5, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
