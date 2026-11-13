@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 4: Одуванчик и Репейник</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+    h2 { color: #f59e0b; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 75%, #14532d 75%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #38bdf8; color: #0f172a; }
+    .b2 { background: #10b981; color: #fff; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 4: Парашюты и Липучки природы</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="startWind()">💨 Запустить ветер</button>
+    <button class="b2" id="btn2" onclick="attachBurdock()">🐕 Пробегающая собака</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Узнай, как семена путешествуют по воздуху и на шерсти животных!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 4: Парашюты и Липучки природы',
+      b1: '💨 Запустить ветер', b2: '🐕 Пробегающая собака', b3: '🔄 Сброс',
+      idle: 'Узнай, как семена путешествуют по воздуху и на шерсти животных!',
+      wind: '💨 Ветер подхватил пушинку одуванчика! Её зонтик создаёт вихревое кольцо и летит очень далеко.',
+      burdock: '🐕 Репейник зацепился микрокрючками за шерсть! Так природа изобрела застёжку-липучку.',
+    },
+    fr: {
+      title: '🌸 Leçon 4 : Parachutes et Agrafes de la Nature',
+      b1: '💨 Lancer le vent', b2: '🐕 Chien qui court', b3: '🔄 Réinitialiser',
+      idle: 'Découvre comment les graines voyagent dans l’air et sur le pelage des animaux !',
+      wind: '💨 Le vent emporte l’aigrette du pissenlit ! Son parachute crée un vortex pour voler très loin.',
+      burdock: '🐕 La bardane s’accroche aux poils grâce à ses micro-crochets. C’est l’ancêtre du Velcro !',
+    },
+    en: {
+      title: '🌸 Lesson 4: Nature’s Parachutes & Velcro',
+      b1: '💨 Start Wind', b2: '🐕 Running Dog', b3: '🔄 Reset',
+      idle: 'Discover how seeds travel through the air and on animal fur!',
+      wind: '💨 Wind lifts the dandelion seed! Its tiny parachute creates a vortex ring to fly incredibly far.',
+      burdock: '🐕 The burdock hook catches onto the fur! This is exactly how nature invented Velcro fasteners.',
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', windP = 0, dogX = -100, burdockAttached = false;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode==='dog'?'burdock':mode];
+  }
+
+  function startWind() { mode = 'wind'; windP = 1; msg.innerText = T[lang].wind; }
+  function attachBurdock() { mode = 'dog'; dogX = -100; burdockAttached = false; msg.innerText = T[lang].burdock; }
+  function reset() { mode = 'idle'; windP = 0; dogX = -100; burdockAttached = false; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+
+    // Одуванчик слева
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(100, 260); ctx.lineTo(100, 200); ctx.stroke();
+    ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(100, 200, 20, 0, Math.PI*2); ctx.fill();
+
+    // Летящее семя одуванчика
+    let seedY = 200, seedX = 100;
+    if (mode === 'wind') {
+      seedX = 100 + (1 - windP) * 200;
+      seedY = 200 - (1 - windP) * 120 + Math.sin(Date.now()/200)*10;
+      windP -= 0.008; if (windP <= 0) windP = 1;
+    }
+    if (mode === 'wind' || mode === 'idle') {
+      ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(seedX, seedY); ctx.lineTo(seedX, seedY - 25); ctx.stroke();
+      ctx.beginPath(); for(let a=-0.8; a<=0.8; a+=0.3) { ctx.moveTo(seedX, seedY-25); ctx.lineTo(seedX+Math.sin(a)*15, seedY-25-Math.cos(a)*10); } ctx.stroke();
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(seedX, seedY, 3, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Собака и репейник справа
+    if (mode === 'dog') {
+      dogX += 3; if (dogX > 500) { dogX = -100; burdockAttached = false; }
+      if (dogX > 250) burdockAttached = true;
+    }
+
+    // Рисуем собаку (упрощенный силуэт кубиками/овалами)
+    ctx.fillStyle = '#eab308';
+    ctx.save(); ctx.translate(dogX, 210);
+    ctx.fillRect(0, 15, 60, 30); // Тело
+    ctx.fillRect(45, 0, 20, 20); // Голова
+    ctx.fillRect(5, 45, 10, 15); ctx.fillRect(45, 45, 10, 15); // Лапы
+    ctx.fillStyle = '#ca8a04'; ctx.fillRect(-15, 15, 15, 8); // Хвост
+    
+    // Зацепившийся репейник на собаке
+    if (burdockAttached) {
+      ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(25, 10, 10, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+
+    // Куст репейника на земле
+    if (!burdockAttached) {
+      ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(280, 230, 12, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 2; // Крючки
+      for(let a=0; a<Math.PI*2; a+=0.5) { ctx.beginPath(); ctx.arc(280+Math.cos(a)*12, 230+Math.sin(a)*12, 3, a, a+1); ctx.stroke(); }
+    }
+    ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(280, 260); ctx.lineTo(280, 235); ctx.stroke();
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
