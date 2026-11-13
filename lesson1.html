@@ -5,112 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Урок 1: Венерин башмачок</title>
   <style>
-    body { margin: 0; padding: 16px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
-    h2 { color: #fde047; font-size: 20px; margin: 0 0 12px; }
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #fde047; color: #0f172a; border-color: #fde047; }
+    h2 { color: #fde047; font-size: 19px; margin: 0 0 10px; }
     canvas { background: #1e293b; border: 2px solid #334155; border-radius: 16px; max-width: 100%; }
-    .btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px 0; }
-    button { padding: 14px 18px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 13px 16px; font-size: 15px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
     .b1 { background: #facc15; color: #0f172a; }
     .b2 { background: #38bdf8; color: #0f172a; }
     .b3 { background: #475569; color: #fff; }
-    #msg { background: #1e293b; border-left: 4px solid #facc15; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 15px; line-height: 1.4; }
+    #msg { background: #1e293b; border-left: 4px solid #facc15; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
   </style>
 </head>
 <body>
-  <h2>🌸 Урок 1: Ловушка Венерина башмачка</h2>
-  <canvas id="c" width="420" height="320"></canvas>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 1: Ловушка Венерина башмачка</h2>
+  <canvas id="c" width="420" height="310"></canvas>
   <div class="btns">
-    <button class="b1" onclick="goBee()">🐝 1. Запустить шмеля</button>
-    <button class="b2" onclick="goLight()">💡 2. Световой маяк</button>
-    <button class="b3" onclick="reset()">🔄 Сброс</button>
+    <button class="b1" id="btn1" onclick="goBee()">🐝 1. Запустить шмеля</button>
+    <button class="b2" id="btn2" onclick="goLight()">💡 2. Световой маяк</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
   </div>
   <div id="msg">Нажми «Запустить шмеля», чтобы проверить, как работает скользкая ловушка цветка.</div>
 
 <script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 1: Ловушка Венерина башмачка',
+      b1: '🐝 1. Запустить шмеля', b2: '💡 2. Световой маяк', b3: '🔄 Сброс',
+      idle: 'Нажми «Запустить шмеля», чтобы проверить, как работает скользкая ловушка цветка.',
+      fall: '🐝 Шмель прилетел на запах, поскользнулся на восковом крае и упал внутрь!',
+      trap: '⚠️ Шмель в ловушке! Стенки скользкие. Нажми «Световой маяк», чтобы показать выход.',
+      climb: '💡 Свет включён! Шмель увидел прозрачные окошки и ползёт к выходу мимо пыльцы!',
+      done: '✅ Готово! Шмель вылетел с пыльцой на спинке без единой капли нектара!'
+    },
+    fr: {
+      title: '🌸 Leçon 1 : Le piège du Sabot de Vénus',
+      b1: '🐝 1. Lancer le bourdon', b2: '💡 2. Phare lumineux', b3: '🔄 Réinitialiser',
+      idle: 'Appuie sur « Lancer le bourdon » pour tester le piège glissant de la fleur.',
+      fall: '🐝 Attiré par le parfum, le bourdon glisse sur le bord ciré et tombe dedans !',
+      trap: '⚠️ Piégé ! Les parois sont glissantes. Active le « Phare lumineux » pour montrer la sortie.',
+      climb: '💡 Lumière allumée ! Le bourdon voit les fenêtres translucides et grimpe vers le pollen !',
+      done: '✅ Mission réussie ! Le bourdon ressort couvert de pollen sans une goutte de nectar !'
+    },
+    en: {
+      title: '🌸 Lesson 1: Lady’s Slipper Trap',
+      b1: '🐝 1. Launch Bumblebee', b2: '💡 2. Light Beacon', b3: '🔄 Reset',
+      idle: 'Tap "Launch Bumblebee" to test how the flower’s slippery trap works.',
+      fall: '🐝 Lured by scent, the bee slips on the waxy rim and falls inside!',
+      trap: '⚠️ Trapped! The walls are too slick. Turn on the "Light Beacon" to show the exit.',
+      climb: '💡 Light on! The bee sees the translucent windows and climbs past the pollen!',
+      done: '✅ Success! The bee escapes carrying pollen with zero drops of nectar spent!'
+    }
+  };
+
+  let lang = 'ru', state = 'idle', light = false, p = 0, bee = { x: 70, y: 50, pollen: false };
   const ctx = document.getElementById('c').getContext('2d');
   const msg = document.getElementById('msg');
-  let state = 'idle', light = false, p = 0, bee = { x: 70, y: 50, pollen: false };
 
-  function goBee() {
-    bee = { x: 70, y: 50, pollen: false };
-    state = 'fall'; p = 0;
-    msg.innerText = '🐝 Шмель прилетел на запах, поскользнулся на восковом крае и упал внутрь!';
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][state];
   }
 
-  function goLight() {
-    light = !light;
-    if (light && state === 'trap') {
-      state = 'climb'; p = 0;
-      msg.innerText = '💡 Свет включён! Шмель увидел прозрачные окошки и ползёт к выходу мимо пыльцы!';
-    }
-  }
-
-  function reset() {
-    state = 'idle'; light = false; p = 0; bee = { x: 70, y: 50, pollen: false };
-    msg.innerText = 'Опыт сброшен. Нажми «Запустить шмеля».';
-  }
+  function goBee() { bee = { x: 70, y: 50, pollen: false }; state = 'fall'; p = 0; msg.innerText = T[lang].fall; }
+  function goLight() { light = !light; if (light && state === 'trap') { state = 'climb'; p = 0; msg.innerText = T[lang].climb; } }
+  function reset() { state = 'idle'; light = false; p = 0; bee = { x: 70, y: 50, pollen: false }; msg.innerText = T[lang].idle; }
 
   function loop() {
-    ctx.clearRect(0, 0, 420, 320);
-
-    // Стебель и лепестки
+    ctx.clearRect(0, 0, 420, 310);
     ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(210, 320); ctx.lineTo(210, 120); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(210, 310); ctx.lineTo(210, 120); ctx.stroke();
 
     ctx.fillStyle = '#7f1d1d';
     ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(100, 100, 40, 160); ctx.quadraticCurveTo(120, 130, 210, 140); ctx.fill();
     ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(320, 100, 380, 160); ctx.quadraticCurveTo(300, 130, 210, 140); ctx.fill();
     ctx.beginPath(); ctx.moveTo(210, 125); ctx.quadraticCurveTo(180, 40, 210, 20); ctx.quadraticCurveTo(240, 40, 210, 125); ctx.fill();
 
-    // Световой маяк
-    if (light) {
-      ctx.fillStyle = 'rgba(253, 224, 71, 0.45)';
-      ctx.beginPath(); ctx.arc(270, 130, 55, 0, Math.PI * 2); ctx.fill();
-    }
+    if (light) { ctx.fillStyle = 'rgba(253, 224, 71, 0.45)'; ctx.beginPath(); ctx.arc(270, 130, 55, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(250, 138, 8, 0, Math.PI * 2); ctx.fill();
 
-    // Пыльца
-    ctx.fillStyle = '#f97316';
-    ctx.beginPath(); ctx.arc(250, 138, 8, 0, Math.PI * 2); ctx.fill();
-
-    // Жёлтая губа-ловушка
     ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
-    ctx.beginPath();
-    ctx.moveTo(160, 145);
-    ctx.bezierCurveTo(120, 200, 140, 280, 210, 280);
-    ctx.bezierCurveTo(280, 280, 300, 190, 260, 130);
-    ctx.lineTo(235, 135);
-    ctx.quadraticCurveTo(240, 165, 205, 165);
-    ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(160, 145); ctx.bezierCurveTo(120, 200, 140, 275, 210, 275);
+    ctx.bezierCurveTo(280, 275, 300, 190, 260, 130); ctx.lineTo(235, 135); ctx.quadraticCurveTo(240, 165, 205, 165); ctx.closePath(); ctx.fill();
 
-    // Движение шмеля
     if (state === 'fall') {
-      p += 0.02; bee.x = 70 + p * 140; bee.y = 50 + p * 180;
-      if (p >= 1) {
-        state = 'trap';
-        msg.innerText = '⚠️ Шмель в ловушке! Стенки скользкие. Нажми «Световой маяк», чтобы показать выход.';
-      }
+      p += 0.02; bee.x = 70 + p * 140; bee.y = 50 + p * 175;
+      if (p >= 1) { state = 'trap'; msg.innerText = T[lang].trap; }
     } else if (state === 'trap') {
-      bee.x = 210 + Math.sin(Date.now() / 120) * 15; bee.y = 230;
-      if (light) { state = 'climb'; p = 0; }
+      bee.x = 210 + Math.sin(Date.now() / 120) * 15; bee.y = 225;
+      if (light) { state = 'climb'; p = 0; msg.innerText = T[lang].climb; }
     } else if (state === 'climb') {
-      p += 0.015; bee.x = 210 + p * 60; bee.y = 230 - p * 100;
+      p += 0.015; bee.x = 210 + p * 60; bee.y = 225 - p * 95;
       if (p > 0.5) bee.pollen = true;
-      if (p >= 1) {
-        state = 'done';
-        msg.innerText = '✅ Готово! Шмель вылетел с пыльцой на спинке без единой капли нектара!';
-      }
+      if (p >= 1) { state = 'done'; msg.innerText = T[lang].done; }
     } else if (state === 'done') {
-      bee.x += 1.5; bee.y -= 0.7;
-      if (bee.x > 440) bee.x = 290;
+      bee.x += 1.5; bee.y -= 0.7; if (bee.x > 440) bee.x = 290;
     }
 
-    // Рисуем шмеля
     ctx.save(); ctx.translate(bee.x, bee.y);
     ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.ellipse(0, 0, 13, 8, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -7, 4, 14); ctx.fillRect(2, -7, 4, 14);
     if (bee.pollen) { ctx.fillStyle = '#fb923c'; ctx.beginPath(); ctx.arc(0, -8, 5, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
-
     requestAnimationFrame(loop);
   }
   loop();
