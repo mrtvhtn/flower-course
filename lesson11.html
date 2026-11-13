@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 11: Подсолнух и Мимоза</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #eab308; color: #0f172a; border-color: #eab308; }
+    h2 { color: #facc15; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 82%, #14532d 82%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #facc15; color: #0f172a; }
+    .b2 { background: #f472b6; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #facc15; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌻 Урок 11: Чувства растений</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="moveSun()">☀️ Двигать солнце</button>
+    <button class="b2" id="btn2" onclick="touchMimosa()">👆 Коснуться мимозы</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">У растений нет глаз и нервов, но они чувствуют свет и прикосновения. Попробуй сам!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌻 Урок 11: Чувства растений',
+      b1: '☀️ Двигать солнце', b2: '👆 Коснуться мимозы', b3: '🔄 Сброс',
+      idle: 'У растений нет глаз и нервов, но они чувствуют свет и прикосновения. Попробуй сам!',
+      sun: '☀️ Гелиотропизм! Молодой подсолнух поворачивает головку вслед за солнцем, чтобы собрать максимум света.',
+      touch: '🌿 Сейсмонастия! Мимоза мгновенно сбрасывает давление воды в клетках и складывает листья для защиты.'
+    },
+    fr: {
+      title: '🌻 Leçon 11 : Les Sens des Plantes',
+      b1: '☀️ Déplacer le soleil', b2: '👆 Toucher le mimosa', b3: '🔄 Réinitialiser',
+      idle: 'Sans yeux ni nerfs, les plantes sentent la lumière et le toucher. Essaie par toi-même !',
+      sun: '☀️ Héliotropisme ! Le jeune tournesol suit le soleil pour capter un maximum d’énergie.',
+      touch: '🌿 Thigmonastie ! Le mimosa pudique replie instantanément ses feuilles pour se protéger.'
+    },
+    en: {
+      title: '🌻 Lesson 11: How Plants Sense the World',
+      b1: '☀️ Move the Sun', b2: '👆 Touch Mimosa', b3: '🔄 Reset',
+      idle: 'Plants have no eyes or nerves, yet they sense light and touch. Try it yourself!',
+      sun: '☀️ Heliotropism! A young sunflower turns its head to follow the sun across the sky.',
+      touch: '🌿 Thigmonasty! Mimosa pudica rapidly folds its leaves when touched to deter insects.'
+    }
+  };
+
+  let lang = 'ru', sunPos = 0, folded = 0, targetFold = 0;
+  const sunCoords = [{x: 90, y: 70}, {x: 210, y: 45}, {x: 330, y: 70}];
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l].idle;
+  }
+
+  function moveSun() {
+    sunPos = (sunPos + 1) % 3;
+    msg.innerText = T[lang].sun;
+  }
+
+  function touchMimosa() {
+    targetFold = 1;
+    msg.innerText = T[lang].touch;
+    setTimeout(() => { targetFold = 0; }, 3200);
+  }
+
+  function reset() {
+    sunPos = 0; targetFold = 0; folded = 0;
+    msg.innerText = T[lang].idle;
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    folded += (targetFold - folded) * 0.12;
+
+    // Солнце
+    const s = sunCoords[sunPos];
+    ctx.fillStyle = '#fde047';
+    ctx.beginPath(); ctx.arc(s.x, s.y, 24, 0, Math.PI * 2); ctx.fill();
+
+    // Подсолнух (слева, x = 130)
+    const tilt = (sunPos - 1) * 14;
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(130, 255); ctx.quadraticCurveTo(130, 190, 130 + tilt, 145); ctx.stroke();
+
+    // Лепестки подсолнуха
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath(); ctx.arc(130 + tilt, 145, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath(); ctx.arc(130 + tilt, 145, 14, 0, Math.PI * 2); ctx.fill();
+
+    // Мимоза стыдливая (справа, x = 295)
+    ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(295, 255); ctx.lineTo(295, 165); ctx.stroke();
+
+    // Парные листочки мимозы
+    for (let i = 0; i < 4; i++) {
+      const ly = 175 + i * 18;
+      const spread = 26 * (1 - folded * 0.85);
+      const drop = folded * 10;
+      ctx.fillStyle = '#86efac';
+      ctx.beginPath(); ctx.ellipse(295 - spread / 2, ly + drop, spread / 2, 4, -folded * 0.6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(295 + spread / 2, ly + drop, spread / 2, 4, folded * 0.6, 0, Math.PI * 2); ctx.fill();
+    }
+
+    ctx.fillStyle = '#cbd5e1'; ctx.font = '12px sans-serif';
+    ctx.fillText('Helianthus (Подсолнух)', 65, 285);
+    ctx.fillText('Mimosa pudica (Мимоза)', 235, 285);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
