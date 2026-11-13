@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 7: Подсолнух и Латук</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #eab308; color: #0f172a; border-color: #eab308; }
+    h2 { color: #eab308; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 85%, #14532d 85%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #facc15; color: #0f172a; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #eab308; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 7: Солнечные трекеры и Компасы природы</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="moveSun()">☀️ Двигать солнце</button>
+    <button class="b2" id="btn2" onclick="toggleNoon()">⏰ Полдень / Компас</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Проверь, как подсолнух следит за светом, а латук настраивает компас!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 7: Солнечные трекеры и Компасы природы',
+      b1: '☀️ Двигать солнце', b2: '⏰ Полдень / Компас', b3: '🔄 Сброс',
+      idle: 'Проверь, как подсолнух следит за светом, а латук настраивает компас!',
+      sunMove: '☀️ Подсолнух плавно разворачивает корзинку за солнцем благодаря ночным гормонам роста ауксинам.',
+      noonOn: '⏰ Полдень! Компасный латук развернул листья ребром к солнцу (север-юг), чтобы не перегреться и сберечь воду.',
+      noonOff: '🌱 Солнце мягкое. Листья латука стоят плоско, улавливая максимум утреннего света.',
+    },
+    fr: {
+      title: '🌸 Leçon 7 : Traqueurs Solaires et Boussoles Naturelles',
+      b1: '☀️ Déplacer le soleil', b2: '⏰ Midi / Boussole', b3: '🔄 Réinitialiser',
+      idle: 'Regarde le tournesol suivre la lumière et la laitue activer sa boussole !',
+      sunMove: '☀️ L’héliotropisme ! Le tournesol tourne sa fleur vers le soleil grâce à l’auxine, une hormone de croissance.',
+      noonOn: '⏰ Midi ! La laitue boussole tourne ses feuilles sur la tranche (nord-sud) pour éviter les brûlures.',
+      noonOff: '🌱 Lumière douce. Les feuilles de la laitue se mettent à plat pour capter les rayons du matin.',
+    },
+    en: {
+      title: '🌸 Lesson 7: Solar Trackers & Nature’s Compasses',
+      b1: '☀️ Move the Sun', b2: '⏰ Noon / Compass', b3: '🔄 Reset',
+      idle: 'Check out how the sunflower tracks light and the lettuce reads its compass!',
+      sunMove: '☀️ Heliotropism! The sunflower smoothly turns its head toward the sun, driven by growth hormones.',
+      noonOn: '⏰ Noon! The compass lettuce turns its leaves edgewise (north-south) to prevent overheating and save water.',
+      noonOff: '🌱 Mild light. The lettuce leaves stay flat to harvest the maximum morning sun.',
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', sunX = 60, sunY = 70, targetSunX = 60, noon = false;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    if(mode === 'noon') msg.innerText = noon ? T[l].noonOn : T[l].noonOff;
+    else msg.innerText = T[l][mode==='sun'?'sunMove':mode];
+  }
+
+  function moveSun() {
+    mode = 'sun';
+    targetSunX = targetSunX === 60 ? 180 : (targetSunX === 180 ? 300 : 60);
+    msg.innerText = T[lang].sunMove;
+  }
+  function toggleNoon() { mode = 'noon'; noon = !noon; msg.innerText = noon ? T[lang].noonOn : T[lang].noonOff; }
+  function reset() { mode = 'idle'; sunX = 60; sunY = 70; targetSunX = 60; noon = false; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+
+    // Анимация солнца
+    sunX += (targetSunX - sunX) * 0.05;
+    sunY = 100 - Math.sin((sunX / 360) * Math.PI) * 50;
+
+    // Рисуем солнце
+    ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(sunX, sunY, 18, 0, Math.PI*2); ctx.fill();
+
+    // ПОДСОЛНУХ (слева, реагирует на sunX)
+    ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(120, 260); ctx.lineTo(120, 160); ctx.stroke();
+    
+    // Поворот цветка подсолнуха
+    ctx.save(); ctx.translate(120, 160);
+    let angle = (sunX - 120) * 0.0025; ctx.rotate(angle);
+    ctx.fillStyle = '#ca8a04'; ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill(); // Серединка
+    ctx.fillStyle = '#fde047'; // Лепестки
+    for(let i=0; i<12; i++) { ctx.rotate(Math.PI/6); ctx.fillRect(10, -3, 14, 6); }
+    ctx.restore();
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Helianthus', 90, 120);
+
+    // ЛАТУК КОМПАСНЫЙ (справа, реагирует на кнопку полдня)
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(280, 260); ctx.lineTo(280, 170); ctx.stroke();
+    
+    ctx.save(); ctx.translate(280, 190);
+    ctx.fillStyle = '#4ade80';
+    if (noon) {
+      // Листья повернуты ребром (узкие)
+      ctx.beginPath(); ctx.ellipse(-15, 0, 4, 18, 0.2, 0, Math.PI*2); ctx.ellipse(15, 10, 4, 18, -0.2, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#ef4444'; ctx.font = '11px sans-serif'; ctx.fillText('N ➔ S', -15, -25);
+    } else {
+      // Листья широкие плоскостью к экрану
+      ctx.beginPath(); ctx.ellipse(-20, 0, 14, 18, 0.4, 0, Math.PI*2); ctx.ellipse(20, 10, 14, 18, -0.4, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    ctx.fillStyle = '#94a3b8'; ctx.fillText('Lactuca serriola', 240, 135);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
