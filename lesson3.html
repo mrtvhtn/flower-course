@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 3: Камнеломка и Проломник</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #22d3ee; color: #0f172a; border-color: #22d3ee; }
+    h2 { color: #22d3ee; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 70%, #334155 70%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #e11d48; color: #fff; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #22d3ee; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 3: Живые алхимики гор</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="dropAcid()">🧪 Капнуть кислоту</button>
+    <button class="b2" id="btn2" onclick="toggleFrost()">❄️ Ледяной ветер</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Помоги растениям выжить на голых скалах. Исследуй их секреты!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 3: Живые алхимики гор',
+      b1: '🧪 Капнуть кислоту', b2: '❄️ Ледяной ветер', b3: '🔄 Сброс',
+      idle: 'Помоги растениям выжить на голых скалах. Исследуй их секреты!',
+      acid: '🧪 Камнеломка выделяет каплю кислоты: прочный гранит растворяется, освобождая путь корням!',
+      frost: '❄️ Дует ледяной ветер! Но внутри плотной подушки проломника температура остаётся тёплой: +5°C!',
+      warm: '☀️ Ветер стих. Подушка проломника надёжно защищает свои корни и побеги от любых заморозков.'
+    },
+    fr: {
+      title: '🌸 Leçon 3 : Les alchimistes des rochers',
+      b1: '🧪 Verser l’acide', b2: '❄️ Vent glacial', b3: '🔄 Réinitialiser',
+      idle: 'Aide les plantes à survivre sur la roche nue. Découvre leurs secrets !',
+      acid: '🧪 La saxifrage sécrète de l’acide : le granit dur se dissout, ouvrant la voie aux racines !',
+      frost: '❄️ Un vent glacial souffle ! Mais au cœur du coussin dense de l’androsace, il fait bon : +5°C !',
+      warm: '☀️ Le vent est tombé. Le coussin protège efficacement ses pousses contre le gel des cimes.'
+    },
+    en: {
+      title: '🌸 Lesson 3: Living Mountain Alchemists',
+      b1: '🧪 Drop Acid', b2: '❄️ Icy Wind', b3: '🔄 Reset',
+      idle: 'Help plants survive on bare rocks. Discover their survival secrets!',
+      acid: '🧪 Saxifrage secretes acid: tough granite dissolves, clearing a path for the roots!',
+      frost: '❄️ An icy wind blows! But inside the dense cushion of androsace, the temperature stays cozy at +5°C!',
+      warm: '☀️ The wind stops. The cushion structure reliably guards roots and shoots from freezing.'
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', acidP = 0, frost = false;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    if(mode==='frost') msg.innerText = frost ? T[l].frost : T[l].warm;
+    else msg.innerText = T[l][mode];
+  }
+
+  function dropAcid() { mode = 'acid'; acidP = 1; msg.innerText = T[lang].acid; }
+  function toggleFrost() { frost = !frost; mode = 'frost'; msg.innerText = frost ? T[lang].frost : T[lang].warm; }
+  function reset() { mode = 'idle'; acidP = 0; frost = false; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+
+    // Скала (гранит)
+    ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.moveTo(0, 310); ctx.lineTo(180, 310); ctx.lineTo(150, 217); ctx.lineTo(0, 217); ctx.fill();
+    ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.moveTo(180, 310); ctx.lineTo(420, 310); ctx.lineTo(420, 217); ctx.lineTo(150, 217); ctx.fill();
+
+    // Камнеломка слева
+    ctx.fillStyle = '#22c55e'; ctx.beginPath(); ctx.arc(80, 215, 25, 0, Math.PI, true); ctx.fill();
+    ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(70, 195, 5, 0, Math.PI*2); ctx.arc(90, 195, 5, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(80, 215); ctx.lineTo(80, 240); ctx.stroke();
+
+    // Анимация кислоты
+    if (acidP > 0) {
+      ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(80, 217 + (1-acidP)*30, 4, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(34,211,238,0.3)'; ctx.beginPath(); ctx.arc(80, 245, 12, 0, Math.PI*2); ctx.fill();
+      acidP -= 0.01;
+    }
+
+    // Проломник справа (подушка)
+    ctx.fillStyle = frost ? '#15803d' : '#16a34a'; ctx.beginPath(); ctx.ellipse(280, 217, 50, 35, 0, 0, Math.PI, true); ctx.fill();
+    ctx.fillStyle = '#f472b6'; ctx.beginPath(); [/*цветки*/ [250,195], [270,190], [290,192], [310,200] ].forEach(pt => ctx.arc(pt[0], pt[1], 3, 0, Math.PI*2)); ctx.fill();
+
+    // Эффекты ветра и температуры
+    if (frost) {
+      ctx.strokeStyle = 'rgba(186,230,253,0.4)'; ctx.lineWidth = 3;
+      for(let i=0; i<3; i++) { ctx.beginPath(); ctx.moveTo(350, 50+i*20); ctx.lineTo(250, 70+i*20); ctx.stroke(); }
+      ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 15px sans-serif'; ctx.fillText('-10°C', 340, 40);
+      ctx.fillStyle = '#f43f5e'; ctx.font = 'bold 15px sans-serif'; ctx.fillText('+5°C', 265, 205);
+    }
+
+    // Подписи
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+    ctx.fillText('Saxifraga', 50, 160); ctx.fillText('Androsace', 255, 150);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
