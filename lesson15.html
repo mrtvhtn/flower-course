@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 15: Литопсы — живые камни</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+    h2 { color: #fbbf24; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 58%, #78350f 58%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #38bdf8; color: #0f172a; }
+    .b2 { background: #facc15; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🪨 Урок 15: Живые камни (Литопсы)</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="showLight()">☀️ Световой луч в «окошки»</button>
+    <button class="b2" id="btn2" onclick="bloomLithops()">🌼 Редкий дождь (Расцвести)</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Среди пустынных камней спрятались живые растения! Узнай, как Литопсы выживают без тени.</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🪨 Урок 15: Живые камни (Литопсы)',
+      b1: '☀️ Световой луч в «окошки»', b2: '🌼 Редкий дождь (Расцвести)', b3: '🔄 Сброс',
+      idle: 'Среди пустынных камней спрятались живые растения! Узнай, как Литопсы выживают без тени.',
+      light: '☀️ На верхушке листьев есть прозрачные «окошки» — они пропускают свет внутрь растения под землю!',
+      bloom: '🌼 После редкого дождя из щели между листьями появляется яркий цветок, похожий на ромашку!'
+    },
+    fr: {
+      title: '🪨 Leçon 15 : Les Pierres Vivantes (Lithops)',
+      b1: '☀️ Rayon de soleil par les « fenêtres »', b2: '🌼 Pluie rare (Fleurir)', b3: '🔄 Réinitialiser',
+      idle: 'Des plantes se cachent parmi les cailloux du désert ! Découvre le secret des Lithops.',
+      light: '☀️ Le sommet des feuilles possède des « fenêtres » translucides qui laissent entrer la lumière sous terre !',
+      bloom: '🌼 Après une pluie rare, une fleur éclatante surgit entre les deux feuilles-cailloux !'
+    },
+    en: {
+      title: '🪨 Lesson 15: Living Stones (Lithops)',
+      b1: '☀️ Shine Light into Leaf Windows', b2: '🌼 Rare Rain (Bloom)', b3: '🔄 Reset',
+      idle: 'Living plants are hiding among desert pebbles! Discover how Lithops survive in the heat.',
+      light: '☀️ Translucent leaf "windows" on top let sunlight travel deep inside the underground body!',
+      bloom: '🌼 After a rare desert rain, a bright daisy-like flower blooms right from the center cleft!'
+    }
+  };
+
+  let lang = 'ru', lightOn = false, bloomed = false, bloomAnim = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][bloomed ? 'bloom' : lightOn ? 'light' : 'idle'];
+  }
+
+  function showLight() { lightOn = true; msg.innerText = T[lang].light; }
+  function bloomLithops() { bloomed = true; msg.innerText = T[lang].bloom; }
+  function reset() { lightOn = false; bloomed = false; bloomAnim = 0; msg.innerText = T[lang].idle; }
+
+  function drawStone(x, y, rx, ry, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    if (bloomed && bloomAnim < 1) bloomAnim += 0.04;
+
+    // Обычные камни вокруг для маскировки
+    drawStone(65, 185, 22, 12, '#64748b');
+    drawStone(350, 188, 25, 13, '#57534e');
+    drawStone(135, 192, 16, 9, '#78716c');
+    drawStone(285, 190, 18, 10, '#64748b');
+
+    // Подземное тело Литопса в разрезе (x = 210)
+    ctx.fillStyle = '#4d7c0f';
+    ctx.beginPath();
+    ctx.moveTo(182, 180); ctx.lineTo(188, 245); ctx.lineTo(232, 245); ctx.lineTo(238, 180);
+    ctx.closePath(); ctx.fill();
+
+    // Корень
+    ctx.strokeStyle = '#d6d3d1'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(210, 245); ctx.lineTo(210, 275); ctx.stroke();
+
+    // Два сросшихся листа-камня на поверхности
+    ctx.fillStyle = '#a8a29e';
+    ctx.beginPath(); ctx.ellipse(196, 178, 17, 11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(224, 178, 17, 11, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Полупрозрачные окошки сверху
+    ctx.fillStyle = lightOn ? '#bef264' : '#78716c';
+    ctx.beginPath(); ctx.ellipse(196, 176, 11, 6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(224, 176, 11, 6, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Лучи света внутри растения
+    if (lightOn) {
+      ctx.fillStyle = 'rgba(254, 240, 138, 0.35)';
+      ctx.beginPath();
+      ctx.moveTo(185, 50); ctx.lineTo(235, 50); ctx.lineTo(226, 235); ctx.lineTo(194, 235);
+      ctx.closePath(); ctx.fill();
+    }
+
+    // Цветок из щели после дождя
+    if (bloomed) {
+      const fy = 175 - bloomAnim * 28;
+      ctx.strokeStyle = '#65a30d'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(210, 178); ctx.lineTo(210, fy); ctx.stroke();
+
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2;
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.ellipse(210 + Math.cos(ang) * 14 * bloomAnim, fy + Math.sin(ang) * 9 * bloomAnim, 9 * bloomAnim, 3.5 * bloomAnim, ang, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath(); ctx.arc(210, fy, 6 * bloomAnim, 0, Math.PI * 2); ctx.fill();
+    }
+
+    ctx.fillStyle = '#fde68a'; ctx.font = '12px sans-serif';
+    ctx.fillText('Lithops — живые камни пустыни', 120, 295);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
