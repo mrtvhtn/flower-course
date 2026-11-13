@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Курс: Инженерия Цветов</title>
+  <style>
+    body { margin: 0; padding: 16px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; cursor: pointer; }
+    .langs button.active { background: #10b981; color: #0f172a; border-color: #10b981; }
+    h1 { color: #10b981; font-size: 22px; margin: 10px 0 4px; }
+    p.desc { color: #94a3b8; font-size: 14px; margin: 0 0 20px; }
+    .menu { display: flex; flex-direction: column; gap: 12px; max-width: 400px; margin: 0 auto; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 14px; text-decoration: none; color: #fff; text-align: left; transition: transform 0.15s; display: flex; align-items: center; justify-content: space-between; }
+    .card:active { transform: scale(0.98); background: #1e293b; }
+    .card-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+    .card-num { font-size: 12px; color: #94a3b8; }
+    .go { font-size: 18px; color: #10b981; }
+    .c1 .card-title { color: #facc15; }
+    .c2 .card-title { color: #c084fc; }
+    .c3 .card-title { color: #22d3ee; }
+  </style>
+</head>
+<body>
+
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+
+  <h1 id="m-title">🌸 Инженерия цветов</h1>
+  <p class="desc" id="m-desc">Интерактивный курс для юных исследователей природы</p>
+
+  <div class="menu">
+    <a href="lesson1.html" class="card c1">
+      <div>
+        <div class="card-num" id="n1">Урок 1</div>
+        <div class="card-title" id="t1">Ловушка Венерина башмачка</div>
+      </div>
+      <div class="go">➔</div>
+    </a>
+
+    <a href="lesson2.html" class="card c2">
+      <div>
+        <div class="card-num" id="n2">Урок 2</div>
+        <div class="card-title" id="t2">Термометр Крокуса и Пружина Цикламена</div>
+      </div>
+      <div class="go">➔</div>
+    </a>
+
+    <a href="lesson3.html" class="card c3">
+      <div>
+        <div class="card-num" id="n3">Урок 3</div>
+        <div class="card-title" id="t3">Живые алхимики гор</div>
+      </div>
+      <div class="go">➔</div>
+    </a>
+  </div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Инженерия цветов',
+      desc: 'Интерактивный курс для юных исследователей природы',
+      n1: 'Урок 1', t1: 'Ловушка Венерина башмачка',
+      n2: 'Урок 2', t2: 'Термометр Крокуса и Пружина Цикламена',
+      n3: 'Урок 3', t3: 'Живые алхимики гор'
+    },
+    fr: {
+      title: '🌸 L’Ingénierie des Fleurs',
+      desc: 'Cours interactif pour les jeunes explorateurs de la nature',
+      n1: 'Leçon 1', t1: 'Le piège du Sabot de Vénus',
+      n2: 'Leçon 2', t2: 'Thermomètre du Crocus et Ressort du Cyclamen',
+      n3: 'Leçon 3', t3: 'Les alchimistes des rochers'
+    },
+    en: {
+      title: '🌸 Flower Engineering',
+      desc: 'Interactive course for young nature explorers',
+      n1: 'Lesson 1', t1: 'Lady’s Slipper Trap',
+      n2: 'Lesson 2', t2: 'Crocus Thermometer & Cyclamen Spring',
+      n3: 'Lesson 3', t3: 'Living Mountain Alchemists'
+    }
+  };
+
+  function setLang(l) {
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('m-title').innerText = T[l].title;
+    document.getElementById('m-desc').innerText = T[l].desc;
+    document.getElementById('n1').innerText = T[l].n1; document.getElementById('t1').innerText = T[l].t1;
+    document.getElementById('n2').innerText = T[l].n2; document.getElementById('t2').innerText = T[l].t2;
+    document.getElementById('n3').innerText = T[l].n3; document.getElementById('t3').innerText = T[l].t3;
+  }
+</script>
+</body>
+</html>
