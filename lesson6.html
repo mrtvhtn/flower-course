@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 6: Насосы Кувшинки и Водопроводы Деревьев</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    h2 { color: #38bdf8; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 80%, #134e4a 80%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #38bdf8; color: #0f172a; }
+    .b2 { background: #10b981; color: #fff; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 6: Природные насосы и водопроводы</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="startPump()">💨 Включить испарение (Насос)</button>
+    <button class="b2" id="btn2" onclick="openAir()">🍃 Воздушный клапан кувшинки</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Исследуй гидравлику растений: как вода поднимается к облакам и как дышат корни под водой!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 6: Природные насосы и водопроводы',
+      b1: '💨 Включить испарение (Насос)', b2: '🍃 Воздушный клапан кувшинки', b3: '🔄 Сброс',
+      idle: 'Исследуй гидравлику растений: как вода поднимается к облакам и как дышат корни под водой!',
+      pump: '💨 Солнце испаряет воду с листьев дерева. Возникает мощная тяга: капиллярный насос поднимает воду на высоту 100 метров!',
+      air: '🍃 Физика кувшинки: тёплые верхние листья создают давление и качают воздух по трубкам-сифонам на самое дно к корням.',
+    },
+    fr: {
+      title: '🌸 Leçon 6 : Pompes Hydrauliques et Siphons Végétaux',
+      b1: '💨 Activer l’évaporation', b2: '🍃 Siphon d’air du nénuphar', b3: '🔄 Réinitialiser',
+      idle: 'Explore l’hydraulique des plantes : comment l’eau monte aux cimes et comment les racines respirent !',
+      pump: '💨 Le soleil évapore l’eau des feuilles. Une tension immense se crée : la pompe capillaire propulse l’eau à 100m de haut !',
+      air: '🍃 Le secret du nénuphar : les feuilles chaudes font pression et envoient l’air par des siphons jusqu’aux racines au fond.',
+    },
+    en: {
+      title: '🌸 Lesson 6: Plant Hydraulic Pumps & Pipelines',
+      b1: '💨 Start Evaporation Pull', b2: '🍃 Water Lily Air Valve', b3: '🔄 Reset',
+      idle: 'Explore plant hydraulics: see how water climbs to the sky and how underwater roots breathe!',
+      pump: '💨 Sun evaporates water from the leaves. This creates huge tension: the capillary pump pulls water up 100 meters high!',
+      air: '🍃 Water lily physics: warm upper leaves build pressure, pumping air down through siphon tubes to the roots in the mud.',
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', waterH = 0, airP = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode];
+  }
+
+  function startPump() { mode = 'pump'; msg.innerText = T[lang].pump; }
+  function openAir() { mode = 'air'; msg.innerText = T[lang].air; }
+  function reset() { mode = 'idle'; waterH = 0; airP = 0; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+
+    if (mode === 'pump' && waterH < 1) waterH += 0.01;
+    if (mode === 'air' && airP < 1) airP += 0.02;
+
+    // ДЕРЕВО (слева)
+    ctx.fillStyle = '#854d0e'; ctx.fillRect(75, 100, 10, 150);
+    ctx.fillStyle = '#16a34a'; ctx.beginPath(); ctx.arc(80, 90, 35, 0, Math.PI*2); ctx.fill();
+    
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(80, 240); ctx.lineTo(80, 240 - waterH * 135); ctx.stroke();
+    
+    if (mode === 'pump') {
+      ctx.fillStyle = 'rgba(226,232,240,0.4)';
+      ctx.beginPath(); ctx.arc(80, 45, 6, 0, Math.PI*2); ctx.arc(65, 50, 4, 0, Math.PI*2); ctx.arc(95, 48, 5, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Транспирация', 40, 150);
+
+    // КУВШИНКА (справа)
+    ctx.fillStyle = '#0891b2'; ctx.fillRect(200, 220, 220, 30);
+    
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(310, 218); ctx.quadraticCurveTo(290, 235, 300, 260); ctx.stroke();
+    ctx.fillStyle = '#15803d'; ctx.beginPath(); ctx.ellipse(320, 218, 25, 5, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ca8a04'; ctx.beginPath(); ctx.arc(300, 262, 6, 0, Math.PI*2); ctx.fill();
+
+    if (mode === 'air' && airP > 0) {
+      ctx.fillStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.arc(313 - airP*11, 218 + airP*15, 3, 0, Math.PI*2);
+      ctx.arc(307 - airP*5, 230 + airP*20, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#94a3b8'; ctx.fillText('Nymphaea (Кувшинка)', 245, 185);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
