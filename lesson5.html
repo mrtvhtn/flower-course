@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 5: Липа и Клевер</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #10b981; color: #0f172a; border-color: #10b981; }
+    h2 { color: #10b981; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 80%, #1c1917 80%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #fbbf24; color: #0f172a; }
+    .b2 { background: #a855f7; color: #fff; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #10b981; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 5: Заводы нектара и Замки цветов</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="makeNectar()">💧 Включить заводик липы</button>
+    <button class="b2" id="btn2" onclick="openClover()">🐝 Шмель открывает клевер</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Узнай, как цветы производят сладкий нектар и прячут его под замок!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 5: Заводы нектара и Замки цветов',
+      b1: '💧 Включить заводик липы', b2: '🐝 Шмель открывает клевер', b3: '🔄 Сброс',
+      idle: 'Узнай, как цветы производят сладкий нектар и прячут его под замок!',
+      nectar: '💧 Завод работает! При теплой погоде чашелистики липы выделяют капли сладкого нектара для пчёл.',
+      clover: '🐝 Замок открыт! Тяжёлый шмель садится на крылья клевера, лепестки опускаются, открывая нектар.',
+    },
+    fr: {
+      title: '🌸 Leçon 5 : Usines à Nectar et Serrures Végétales',
+      b1: '💧 Activer le nectar de tilleul', b2: '🐝 Le bourdon ouvre le trèfle', b3: '🔄 Réinitialiser',
+      idle: 'Découvre comment les fleurs produisent le nectar sucré et le cachent sous clé !',
+      nectar: '💧 L’usine est lancée ! Par temps chaud, les sépales du tilleul sécrètent de douces gouttes de nectar.',
+      clover: '🐝 Serrure débloquée ! Le bourdon lourd se pose sur le trèfle, abaissant les pétales pour boire.',
+    },
+    en: {
+      title: '🌸 Lesson 5: Nectar Factories & Flower Locks',
+      b1: '💧 Start Lime Tree Nectar', b2: '🐝 Bee Unlocks Clover', b3: '🔄 Reset',
+      idle: 'Discover how flowers produce sweet nectar and hide it under lock and key!',
+      nectar: '💧 Factory active! In warm weather, linden sepals secrete droplets of sweet nectar for bees.',
+      clover: '🐝 Lock opened! A heavy bumblebee lands on the clover wings, pressing petals down to reach nectar.',
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', nectarScale = 0, cloverOpen = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode];
+  }
+
+  function makeNectar() { mode = 'nectar'; msg.innerText = T[lang].nectar; }
+  function openClover() { mode = 'clover'; msg.innerText = T[lang].clover; }
+  function reset() { mode = 'idle'; nectarScale = 0; cloverOpen = 0; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+
+    // Плавная анимация
+    if (mode === 'nectar' && nectarScale < 1) nectarScale += 0.03;
+    if (mode === 'clover' && cloverOpen < 1) cloverOpen += 0.05;
+
+    // ЛИПА (слева)
+    ctx.strokeStyle = '#854d0e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(100, 250); ctx.lineTo(100, 130); ctx.stroke();
+    // Чашелистики липы
+    ctx.fillStyle = '#a3e635'; ctx.beginPath(); ctx.moveTo(100, 130); ctx.lineTo(70, 100); ctx.lineTo(130, 100); ctx.closePath(); ctx.fill();
+    // Цветок липы
+    ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(100, 95, 15, 0, Math.PI*2); ctx.fill();
+    // Капли нектара
+    if (nectarScale > 0) {
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath(); ctx.arc(85, 105, 4 * nectarScale, 0, Math.PI*2);
+      ctx.arc(115, 105, 5 * nectarScale, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Tilia (Липа)', 65, 160);
+
+    // КЛЕВЕР (справа)
+    ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(300, 250); ctx.lineTo(300, 150); ctx.stroke();
+    
+    // Лепестки клевера ("замок")
+    ctx.save(); ctx.translate(300, 150);
+    ctx.fillStyle = '#f472b6';
+    // Флаг (верхний лепесток)
+    ctx.beginPath(); ctx.ellipse(0, -20, 15, 20, 0, 0, Math.PI*2); ctx.fill();
+    // Крылья и лодочка (опускаются шмелем)
+    ctx.save(); ctx.translate(0, 5); ctx.rotate(cloverOpen * 0.25);
+    ctx.fillStyle = '#db2777';
+    ctx.beginPath(); ctx.ellipse(-12, 0, 14, 8, 0, 0, Math.PI*2); ctx.ellipse(12, 0, 14, 8, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    ctx.restore();
+
+    // Шмель на клевере
+    if (mode === 'clover') {
+      ctx.save(); ctx.translate(300, 140 + cloverOpen * 12);
+      ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.ellipse(0, 0, 14, 9, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -8, 4, 16); ctx.fillRect(3, -8, 4, 16);
+      ctx.restore();
+    }
+    ctx.fillStyle = '#94a3b8'; ctx.fillText('Trifolium (Клевер)', 250, 170);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
