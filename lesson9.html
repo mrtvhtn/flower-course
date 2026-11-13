@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 9: Венерина мухоловка и Росянка</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #ec4899; color: #fff; border-color: #ec4899; }
+    h2 { color: #f472b6; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 82%, #1e3a2f 82%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #22c55e; color: #0f172a; }
+    .b2 { background: #f472b6; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #f472b6; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🪤 Урок 9: Растения-охотники</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="triggerTrap()">🪰 Коснуться волосков (2 раза)</button>
+    <button class="b2" id="btn2" onclick="stickDew()">💧 Капля росянки</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">На болотах в почве мало питания. Проверь, как охотятся Венерина мухоловка и Росянка!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🪤 Урок 9: Растения-охотники',
+      b1: '🪰 Коснуться волосков (2 раза)', b2: '💧 Капля росянки', b3: '🔄 Сброс',
+      idle: 'На болотах в почве мало питания. Проверь, как охотятся Венерина мухоловка и Росянка!',
+      one: '⚡ Первое касание! Мухоловка включила таймер на 20 секунд — ждёт второго касания, чтобы не тратить силы на дождинку.',
+      snap: '💥 Второе касание! Створки захлопнулись за доли секунды — ловушка сработала!',
+      dew: '✨ Росянка блестит сладкими липкими каплями и медленно сворачивает лист вокруг добычи!'
+    },
+    fr: {
+      title: '🪤 Leçon 9 : Les Plantes Carnivores',
+      b1: '🪰 Toucher les poils (2 fois)', b2: '💧 Goutte de Rossolis', b3: '🔄 Réinitialiser',
+      idle: 'Dans les marais pauvres en nutriments, découvre comment chassent la Dionée et le Rossolis !',
+      one: '⚡ Premier contact ! La Dionée lance un compte à rebours pour éviter de se fermer sur une goutte de pluie.',
+      snap: '💥 Deuxième contact ! Le piège se referme en une fraction de seconde !',
+      dew: '✨ Le Rossolis attire sa proie avec ses gouttes sucrées collantes et enroule sa feuille !'
+    },
+    en: {
+      title: '🪤 Lesson 9: Carnivorous Plants',
+      b1: '🪰 Touch Trigger Hairs (2x)', b2: '💧 Sundew Sticky Drop', b3: '🔄 Reset',
+      idle: 'Bog soil lacks nutrients. See how Venus Flytrap and Sundew catch insects!',
+      one: '⚡ First touch! The Flytrap starts a 20-second timer so it does not waste energy on raindrops.',
+      snap: '💥 Second touch! The jaw-like leaves snap shut in a fraction of a second!',
+      dew: '✨ Sundew lures insects with glistening sticky nectar drops and slowly curls its leaf!'
+    }
+  };
+
+  let lang = 'ru', touches = 0, closed = 0, curled = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l].idle;
+  }
+
+  function triggerTrap() {
+    touches++;
+    if (touches === 1) {
+      msg.innerText = T[lang].one;
+    } else {
+      msg.innerText = T[lang].snap;
+    }
+  }
+
+  function stickDew() {
+    curled = 1;
+    msg.innerText = T[lang].dew;
+  }
+
+  function reset() {
+    touches = 0; closed = 0; curled = 0;
+    msg.innerText = T[lang].idle;
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    const targetClose = touches >= 2 ? 1 : 0;
+    closed += (targetClose - closed) * 0.2;
+
+    // Венерина мухоловка (слева, x = 125)
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(125, 255); ctx.lineTo(125, 175); ctx.stroke();
+
+    const angle = 0.55 * (1 - closed);
+    ctx.fillStyle = '#4ade80';
+    // Верхняя и нижняя створки
+    ctx.beginPath(); ctx.ellipse(125, 160 - angle * 18, 36, 16, -angle * 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(125, 175 + angle * 18, 36, 16, angle * 0.3, 0, Math.PI * 2); ctx.fill();
+    // Красная середина
+    if (closed < 0.7) {
+      ctx.fillStyle = '#fb7185';
+      ctx.beginPath(); ctx.ellipse(125, 168, 24, 9, 0, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Росянка (справа, x = 295)
+    ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(295, 255); ctx.lineTo(295, 185); ctx.stroke();
+
+    const leafR = curled ? 20 : 34;
+    ctx.fillStyle = '#86efac';
+    ctx.beginPath(); ctx.arc(295, 165, leafR, 0, Math.PI * 2); ctx.fill();
+
+    // Блестящие капельки росянки
+    for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+      const rx = 295 + Math.cos(a) * (leafR + 6);
+      const ry = 165 + Math.sin(a) * (leafR + 6);
+      ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(295, 165); ctx.lineTo(rx, ry); ctx.stroke();
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath(); ctx.arc(rx, ry, 4, 0, Math.PI * 2); ctx.fill();
+    }
+
+    ctx.fillStyle = '#cbd5e1'; ctx.font = '12px sans-serif';
+    ctx.fillText('Dionaea (Мухоловка)', 62, 285);
+    ctx.fillText('Drosera (Росянка)', 245, 285);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
