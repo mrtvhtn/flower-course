@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 8: Электричество Петунии и Датчики Шмеля</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #a855f7; color: #fff; border-color: #a855f7; }
+    h2 { color: #a855f7; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 85%, #1e1b4b 85%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #a855f7; color: #fff; }
+    .b2 { background: #facc15; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #a855f7; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 8: Биоэлектричество и Датчики полей</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="chargeFlower()">⚡ Зарядить цветок (минус)</button>
+    <button class="b2" id="btn2" onclick="flyBee()">🐝 Прилет шмеля (плюс)</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Узнай, как цветы используют электричество, чтобы общаться со шмелями на расстоянии!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 8: Биоэлектричество и Датчики полей',
+      b1: '⚡ Зарядить цветок (минус)', b2: '🐝 Прилет шмеля (плюс)', b3: '🔄 Сброс',
+      idle: 'Узнай, как цветы используют электричество, чтобы общаться со шмелями на расстоянии!',
+      charge: '⚡ Цветок петунии имеет слабый отрицательный заряд (-). Вокруг него возникает невидимое биоэлектрическое поле.',
+      bee: '🐝 Шмель летит по воздуху и собирает положительный заряд (+). Волоски на его теле отклоняются к цветку под действием поля!',
+      land: '💥 Контакт! Шмель сел на цветок, забрал нектар и изменил его заряд. Другие пчёлы теперь знают издалека: этот цветок пуст!',
+    },
+    fr: {
+      title: '🌸 Leçon 8 : Bioélectricité et Capteurs de Champs',
+      b1: '⚡ Charger la fleur (moins)', b2: '🐝 Vol du bourdon (plus)', b3: '🔄 Réinitialiser',
+      idle: 'Découvre comment les fleurs communiquent avec les bourdons grâce à l’électricité !',
+      charge: '⚡ La fleur de pétunia possède une charge négative (-). Un champ bioélectrique invisible l’entoure.',
+      bee: '🐝 Le bourdon se charge positivement (+) en plein vol. Les poils de son corps sont attirés par le champ de la fleur !',
+      land: '💥 Contact ! Le bourdon se pose, boit le nectar et modifie la charge. Les autres abeilles savent que la fleur est vide !',
+    },
+    en: {
+      title: '🌸 Lesson 8: Bioelectricity & Field Sensors',
+      b1: '⚡ Charge Flower (minus)', b2: '🐝 Fly Bumblebee (plus)', b3: '🔄 Reset',
+      idle: 'Find out how flowers use electric fields to talk to bees from a distance!',
+      charge: '⚡ The petunia flower holds a weak negative charge (-). An invisible bioelectric field forms around it.',
+      bee: '🐝 Flying through the air, the bee gathers a positive charge (+50V). Body hairs bend toward the flower!',
+      land: '💥 Contact! The bee lands, takes nectar, and changes the field. Other bees now know from afar: this cup is empty!',
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', charged = false, beeP = 0, fieldPulse = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode==='land'?'land':mode];
+  }
+
+  function chargeFlower() { mode = 'charge'; charged = true; msg.innerText = T[lang].charge; }
+  function flyBee() { if(!charged) charged = true; mode = 'bee'; beeP = 0; msg.innerText = T[lang].bee; }
+  function reset() { mode = 'idle'; charged = false; beeP = 0; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    fieldPulse += 0.05;
+
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(210, 270); ctx.lineTo(210, 180); ctx.stroke();
+    ctx.fillStyle = '#c084fc'; ctx.beginPath(); ctx.moveTo(210, 180);
+    ctx.bezierCurveTo(150, 130, 130, 90, 210, 90); ctx.bezierCurveTo(290, 90, 270, 130, 210, 180); ctx.fill();
+    ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(210, 125, 12, 0, Math.PI*2); ctx.fill();
+
+    if (charged) {
+      ctx.strokeStyle = 'rgba(168,85,247,0.25)'; ctx.lineWidth = 2;
+      let r = 55 + Math.sin(fieldPulse) * 5;
+      ctx.beginPath(); ctx.arc(210, 125, r, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(210, 125, r + 20, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#a855f7'; ctx.font = '12px sans-serif';
+      ctx.fillText('- - -', 150, 125); ctx.fillText('- - -', 250, 125);
+    }
+
+    let bx = 60, by = 60;
+    if (mode === 'bee') {
+      bx = 60 + beeP * 150; by = 60 + beeP * 55;
+      beeP += 0.01; if (beeP >= 1) { mode = 'land'; msg.innerText = T[lang].land; }
+    } else if (mode === 'land') { bx = 210; by = 115; }
+
+    ctx.save(); ctx.translate(bx, by);
+    ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.ellipse(0, 0, 13, 8, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(-5, -7, 4, 14); ctx.fillRect(2, -7, 4, 14);
+    
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+    for(let a = -Math.PI; a < Math.PI; a += 0.6) {
+      let len = 4; let dx = Math.cos(a) * len, dy = Math.sin(a) * len;
+      if (mode === 'bee' && bx > 130) { dx += 2; dy += 1; }
+      ctx.beginPath(); ctx.moveTo(Math.cos(a)*8, Math.sin(a)*5); ctx.lineTo(Math.cos(a)*8 + dx, Math.sin(a)*5 + dy); ctx.stroke();
+    }
+    if (mode === 'bee') { ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 11px sans-serif'; ctx.fillText('+', -3, -11); }
+    ctx.restore();
+
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Petunia', 185, 75);
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
