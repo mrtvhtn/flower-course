@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 10: Секвойя и Банксия</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #f97316; color: #fff; border-color: #f97316; }
+    h2 { color: #f97316; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 80%, #292524 80%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #f97316; color: #fff; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #f97316; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌲 Урок 10: Семена, рождённые огнём</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="heatCone()">🔥 Жар огня (Расплавить смолу)</button>
+    <button class="b2" id="btn2" onclick="rainAsh()">🌧 Дождь и зола (Прорастить)</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Шишки Секвойи и Банксии запечатаны смолой. Проверь, как огонь открывает им путь к жизни!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌲 Урок 10: Семена, рождённые огнём',
+      b1: '🔥 Жар огня (Расплавить смолу)', b2: '🌧 Дождь и зола (Прорастить)', b3: '🔄 Сброс',
+      idle: 'Шишки Секвойи и Банксии запечатаны смолой. Проверь, как огонь открывает им путь к жизни!',
+      heat: '🔥 Жар расплавил смолу! Чешуйки шишек раскрылись, и лёгкие семена высыпались на тёплую землю.',
+      grow: '🌱 После дождя зола стала лучшим удобрением — из семян дружно проросли молодые Секвойи и Банксии!'
+    },
+    fr: {
+      title: '🌲 Leçon 10 : Graines Nées du Feu',
+      b1: '🔥 Chaleur du feu (Fondre la résine)', b2: '🌧 Pluie et cendres (Germer)', b3: '🔄 Réinitialiser',
+      idle: 'Les cônes de Séquoia et de Banksia sont scellés par la résine. Découvre comment le feu libère les graines !',
+      heat: '🔥 La chaleur fait fondre la résine ! Les écailles s’ouvrent et libèrent les graines sur le sol.',
+      grow: '🌱 Après la pluie, la cendre nourrit la terre : de jeunes pousses de Séquoia et Banksia grandissent !'
+    },
+    en: {
+      title: '🌲 Lesson 10: Seeds Born from Fire',
+      b1: '🔥 Heat of Fire (Melt Resin)', b2: '🌧 Rain & Ash (Sprout)', b3: '🔄 Reset',
+      idle: 'Sequoia and Banksia cones are sealed with resin. See how fire unlocks new life!',
+      heat: '🔥 Heat melts the resin seal! The cone scales open and drop seeds onto the warm ground.',
+      grow: '🌱 After the rain, nutrient-rich ash feeds the soil — young Sequoia and Banksia sprouts emerge!'
+    }
+  };
+
+  let lang = 'ru', stage = 0, open = 0, sprout = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][stage === 0 ? 'idle' : stage === 1 ? 'heat' : 'grow'];
+  }
+
+  function heatCone() { stage = 1; msg.innerText = T[lang].heat; }
+  function rainAsh() { if (stage >= 1) { stage = 2; msg.innerText = T[lang].grow; } }
+  function reset() { stage = 0; open = 0; sprout = 0; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    if (stage >= 1 && open < 1) open += 0.04;
+    if (stage === 2 && sprout < 1) sprout += 0.03;
+
+    // Ветка сверху
+    ctx.strokeStyle = '#78350f'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(40, 45); ctx.lineTo(380, 45); ctx.stroke();
+
+    // Две шишки (Секвойя слева, Банксия справа)
+    [130, 290].forEach((x, idx) => {
+      ctx.fillStyle = idx === 0 ? '#9a3412' : '#b45309';
+      ctx.beginPath(); ctx.ellipse(x, 95, 22 + open * 12, 34, 0, 0, Math.PI * 2); ctx.fill();
+      if (stage === 0) {
+        ctx.strokeStyle = '#facc15'; ctx.lineWidth = 2;
+        ctx.strokeRect(x - 16, 75, 32, 40);
+      }
+      if (stage >= 1) {
+        ctx.fillStyle = '#fde047';
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath(); ctx.arc(x + i * 18, 160 + open * 75, 4, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    });
+
+    // Огонь на стадии 1
+    if (stage === 1) {
+      ctx.fillStyle = 'rgba(249, 115, 22, 0.75)';
+      for (let fx = 70; fx <= 350; fx += 45) {
+        ctx.beginPath(); ctx.arc(fx, 242, 16 + Math.sin(Date.now() / 100 + fx) * 4, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Ростки на стадии 2
+    if (stage === 2) {
+      [112, 130, 148, 272, 290, 308].forEach(sx => {
+        ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(sx, 248); ctx.lineTo(sx, 248 - sprout * 45); ctx.stroke();
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath(); ctx.arc(sx, 248 - sprout * 45, 7 * sprout, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+    ctx.fillText('Sequoiadendron (Секвойя)', 65, 280);
+    ctx.fillText('Banksia (Банксия)', 245, 280);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
