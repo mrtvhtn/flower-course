@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 12: Подземная сеть леса (Микориза)</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    h2 { color: #38bdf8; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 52%, #292524 52%); border: 2px solid #475569; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #facc15; color: #0f172a; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #475569; color: #fff; }
+    #msg { background: #1e293b; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🍄 Урок 12: Подземная сеть леса</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="sendSugar()">🍯 Сахар от дерева грибу</button>
+    <button class="b2" id="btn2" onclick="sendWater()">💧 Вода и питание от гриба</button>
+    <button class="b3" id="btn3" onclick="reset()">🔄 Сброс</button>
+  </div>
+  <div id="msg">Под землёй корни деревьев и нити грибов соединены в живую сеть. Запусти обмен!</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🍄 Урок 12: Подземная сеть леса',
+      b1: '🍯 Сахар от дерева грибу', b2: '💧 Вода и питание от гриба', b3: '🔄 Сброс',
+      idle: 'Под землёй корни деревьев и нити грибов соединены в живую сеть. Запусти обмен!',
+      sugar: '🍯 Дерево поймало солнечный свет листьями и отправило сладкую глюкозу вниз для грибницы!',
+      water: '💧 Грибница впитала воду и минералы из почвы и передала их дереву и молодому ростку!'
+    },
+    fr: {
+      title: '🍄 Leçon 12 : Le Réseau Secret de la Forêt',
+      b1: '🍯 Sucre de l’arbre au champignon', b2: '💧 Eau et minéraux du champignon', b3: '🔄 Réinitialiser',
+      idle: 'Sous terre, les racines et les champignons forment un réseau vivant. Lance l’échange !',
+      sugar: '🍯 L’arbre capte le soleil et envoie du sucre vers le mycélium sous la terre !',
+      water: '💧 Le champignon puise l’eau et les minéraux du sol pour nourrir l’arbre et la jeune pousse !'
+    },
+    en: {
+      title: '🍄 Lesson 12: The Forest Underground Web',
+      b1: '🍯 Sugar from Tree to Fungus', b2: '💧 Water & Minerals from Fungus', b3: '🔄 Reset',
+      idle: 'Underground, tree roots and fungal threads form a living network. Start the exchange!',
+      sugar: '🍯 The tree captures sunlight in its leaves and sends sweet glucose down to the fungus!',
+      water: '💧 The fungal web gathers water and minerals from soil and shares them with the trees!'
+    }
+  };
+
+  let lang = 'ru', mode = 0, pulse = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode === 0 ? 'idle' : mode === 1 ? 'sugar' : 'water'];
+  }
+
+  function sendSugar() { mode = 1; pulse = 0; msg.innerText = T[lang].sugar; }
+  function sendWater() { mode = 2; pulse = 0; msg.innerText = T[lang].water; }
+  function reset() { mode = 0; pulse = 0; msg.innerText = T[lang].idle; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    pulse = (pulse + 0.02) % 1;
+
+    // Большое дерево слева (x = 105)
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(97, 85, 16, 76);
+    ctx.fillStyle = '#22c55e';
+    ctx.beginPath(); ctx.arc(105, 68, 42, 0, Math.PI * 2); ctx.fill();
+
+    // Гриб в центре (x = 215)
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(210, 138, 10, 23);
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath(); ctx.arc(215, 138, 22, Math.PI, 0); ctx.fill();
+
+    // Маленький росток справа (x = 325)
+    ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(325, 161); ctx.lineTo(325, 128); ctx.stroke();
+    ctx.fillStyle = '#4ade80';
+    ctx.beginPath(); ctx.arc(325, 122, 14, 0, Math.PI * 2); ctx.fill();
+
+    // Подземная сеть микоризы
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(105, 161); ctx.quadraticCurveTo(105, 225, 215, 225);
+    ctx.quadraticCurveTo(325, 225, 325, 161);
+    ctx.moveTo(215, 161); ctx.lineTo(215, 255);
+    ctx.stroke();
+
+    // Движущиеся импульсы обмена
+    if (mode === 1) {
+      ctx.fillStyle = '#facc15';
+      const x = 105 + pulse * 110;
+      const y = 161 + Math.sin(pulse * Math.PI * 0.5) * 64;
+      ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+    } else if (mode === 2) {
+      ctx.fillStyle = '#38bdf8';
+      const x1 = 215 - pulse * 110;
+      const x2 = 215 + pulse * 110;
+      const y = 225 - Math.pow(pulse, 2) * 64;
+      ctx.beginPath(); ctx.arc(x1, y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x2, y, 6, 0, Math.PI * 2); ctx.fill();
+    }
+
+    ctx.fillStyle = '#cbd5e1'; ctx.font = '12px sans-serif';
+    ctx.fillText('Mycorrhiza — лесная сеть обмена', 120, 290);
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
