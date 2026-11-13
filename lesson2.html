@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Урок 2: Крокус и Цикламен</title>
+  <style>
+    body { margin: 0; padding: 14px; background: #0f172a; color: #fff; font-family: sans-serif; text-align: center; }
+    .langs { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .langs button { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .langs button.active { background: #c084fc; color: #0f172a; border-color: #c084fc; }
+    h2 { color: #c084fc; font-size: 19px; margin: 0 0 10px; }
+    canvas { background: linear-gradient(180deg, #1e293b 75%, #271c19 75%); border: 2px solid #334155; border-radius: 16px; max-width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+    .btns button { padding: 12px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+    .b1 { background: #facc15; color: #0f172a; }
+    .b2 { background: #38bdf8; color: #0f172a; }
+    .b3 { background: #f472b6; color: #0f172a; }
+    #msg { background: #1e293b; border-left: 4px solid #c084fc; padding: 12px; border-radius: 8px; max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="langs">
+    <button id="l-ru" class="active" onclick="setLang('ru')">🇷🇺 RU</button>
+    <button id="l-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button id="l-en" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <h2 id="title">🌸 Урок 2: Термометр Крокуса и Пружина Цикламена</h2>
+  <canvas id="c" width="420" height="310"></canvas>
+  <div class="btns">
+    <button class="b1" id="btn1" onclick="setW('sun')">☀️ Солнце (+12°C)</button>
+    <button class="b2" id="btn2" onclick="setW('cold')">❄️ Мороз (-2°C)</button>
+    <button class="b3" id="btn3" onclick="doSpring()">🌀 Пружина цикламена</button>
+  </div>
+  <div id="msg">Управляй погодой в горах: проверь термометр крокуса и пружину цикламена.</div>
+
+<script>
+  const T = {
+    ru: {
+      title: '🌸 Урок 2: Термометр Крокуса и Пружина Цикламена',
+      b1: '☀️ Солнце (+12°C)', b2: '❄️ Мороз (-2°C)', b3: '🌀 Пружина цикламена',
+      idle: 'Управляй погодой в горах: проверь термометр крокуса и пружину цикламена.',
+      sun: '☀️ Солнце прогрело воздух: лепестки крокуса раскрываются навстречу пчёлам!',
+      cold: '❄️ Мороз! Крокус уловил перепад в 1°C и захлопнул лепестки, спасая пыльцу.',
+      coil: '🌀 Пружина сработала! Стебель цикламена скрутился и спрятал семена в землю!',
+      uncoil: '🌱 Пружина расправлена: цветоножка снова подняла бутон к свету.'
+    },
+    fr: {
+      title: '🌸 Leçon 2 : Thermomètre du Crocus et Ressort du Cyclamen',
+      b1: '☀️ Soleil (+12°C)', b2: '❄️ Gel (-2°C)', b3: '🌀 Ressort du cyclamen',
+      idle: 'Contrôle la météo en montagne : teste le crocus et le ressort du cyclamen.',
+      sun: '☀️ Le soleil réchauffe l’air : les pétales du crocus s’ouvrent pour les abeilles !',
+      cold: '❄️ Gel nocturne ! Le crocus détecte 1°C d’écart et ferme ses pétales.',
+      coil: '🌀 Ressort activé ! La tige du cyclamen s’enroule et pose les graines au sol !',
+      uncoil: '🌱 Ressort détendu : la tige remonte vers la lumière.'
+    },
+    en: {
+      title: '🌸 Lesson 2: Crocus Thermometer & Cyclamen Spring',
+      b1: '☀️ Sun (+12°C)', b2: '❄️ Frost (-2°C)', b3: '🌀 Cyclamen Spring',
+      idle: 'Control mountain weather: test the crocus thermometer and cyclamen spring.',
+      sun: '☀️ Warm sun: the crocus petals open wide to welcome bees!',
+      cold: '❄️ Frost! The crocus senses a 1°C drop and seals its petals to protect pollen.',
+      coil: '🌀 Spring coiled! The cyclamen stem twists down to tuck seeds into the soil!',
+      uncoil: '🌱 Spring uncoiled: the stem lifts the bud back toward the light.'
+    }
+  };
+
+  let lang = 'ru', mode = 'idle', openT = 0.65, openC = 0.65, coiled = false, sp = 0;
+  const ctx = document.getElementById('c').getContext('2d');
+  const msg = document.getElementById('msg');
+
+  function setLang(l) {
+    lang = l;
+    ['ru','fr','en'].forEach(k => document.getElementById('l-'+k).className = (k===l?'active':''));
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('btn1').innerText = T[l].b1;
+    document.getElementById('btn2').innerText = T[l].b2;
+    document.getElementById('btn3').innerText = T[l].b3;
+    msg.innerText = T[l][mode];
+  }
+
+  function setW(w) { mode = w; openT = (w === 'sun') ? 0.75 : 0.08; msg.innerText = T[lang][w]; }
+  function doSpring() { coiled = !coiled; mode = coiled ? 'coil' : 'uncoil'; msg.innerText = T[lang][mode]; }
+
+  function loop() {
+    ctx.clearRect(0, 0, 420, 310);
+    openC += (openT - openC) * 0.08;
+    sp += ((coiled ? 1 : 0) - sp) * 0.06;
+
+    // Крокус слева
+    ctx.fillStyle = '#d97706'; ctx.beginPath(); ctx.ellipse(120, 265, 20, 15, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(120, 250); ctx.lineTo(120, 160); ctx.stroke();
+    ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(120, 142, 6, 0, Math.PI * 2); ctx.fill();
+    [-openC, -openC*0.45, 0, openC*0.45, openC].forEach((a, i) => {
+      ctx.save(); ctx.translate(120, 162); ctx.rotate(a);
+      ctx.fillStyle = i%2===0 ? 'rgba(168,85,247,0.88)' : 'rgba(192,132,252,0.92)';
+      ctx.beginPath(); ctx.ellipse(0, -38, 12, 38, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    });
+
+    // Цикламен справа
+    ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.ellipse(300, 265, 25, 14, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(300, 250);
+    let lx = 300, ly = 130;
+    if (sp < 0.04) {
+      ctx.lineTo(300, 130); ctx.stroke();
+    } else {
+      const h = 115 * (1 - sp * 0.72), r = 15 * sp;
+      for (let i = 1; i <= 50; i++) {
+        const t = i / 50, ang = t * 4 * Math.PI * 2;
+        lx = 300 + Math.sin(ang) * r; ly = 245 - t * h; ctx.lineTo(lx, ly);
+      }
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#f472b6'; ctx.beginPath(); ctx.arc(lx, ly, 10, 0, Math.PI * 2); ctx.fill();
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
+</body>
+</html>
