@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leçon 1 — Batteries souterraines et ressorts-coffres</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(180deg, #fdf6f9 0%, #eef7f1 100%); color: #2c3e50; margin: 0; padding: 20px; }
+  .container { max-width: 820px; margin: 0 auto; background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 12px 35px rgba(0,0,0,0.08); }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .back-btn { text-decoration: none; color: #5b6e7a; font-weight: 600; background: #f0f4f8; padding: 8px 16px; border-radius: 20px; }
+  .lang-btns button { border: none; background: #f0f4f8; padding: 8px 14px; border-radius: 16px; cursor: pointer; font-weight: 700; margin-left: 4px; }
+  .lang-btns button.active { background: #d63384; color: #fff; }
+  h1 { color: #b8296d; font-size: 1.8rem; margin-bottom: 10px; }
+  .story { font-size: 1.12rem; line-height: 1.65; background: #fff8fb; padding: 18px; border-radius: 16px; border-left: 5px solid #d63384; }
+  .lab-box { margin-top: 24px; background: #f4fbf7; border-radius: 20px; padding: 20px; text-align: center; border: 2px dashed #88c9a1; }
+  svg { max-width: 100%; height: 270px; }
+  .action-btn { background: linear-gradient(135deg, #d63384, #e85d9e); color: white; border: none; padding: 14px 26px; font-size: 1.05rem; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: 0 6px 18px rgba(214,51,132,0.3); transition: transform 0.2s; margin: 6px; }
+  .action-btn:hover { transform: scale(1.04); }
+  .happy-msg { margin-top: 14px; font-size: 1.15rem; font-weight: 700; color: #198754; min-height: 30px; }
+  @keyframes bounceFlower { 0%, 100% { transform: translateY(0) rotate(0deg); } 30% { transform: translateY(-14px) rotate(-4deg); } 60% { transform: translateY(-7px) rotate(4deg); } }
+  .celebrate { animation: bounceFlower 0.9s ease infinite; transform-origin: 200px 210px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-bar">
+    <a href="index.html" class="back-btn" id="backTxt">← Retour au cours</a>
+    <div class="lang-btns">
+      <button onclick="setLang('fr')" id="btn-fr" class="active">FR</button>
+      <button onclick="setLang('en')" id="btn-en">EN</button>
+      <button onclick="setLang('ru')" id="btn-ru">RU</button>
+    </div>
+  </div>
+
+  <h1 id="title">Leçon 1 : Batteries souterraines et ressorts-coffres</h1>
+  <div class="story" id="story"></div>
+
+  <div class="lab-box">
+    <h3 id="labTitle">Expérience : Active le ressort secret du Cyclamen !</h3>
+    <svg viewBox="0 0 400 260" id="scene">
+      <!-- Земля и подземная батарейка-клубень -->
+      <rect x="0" y="205" width="400" height="55" fill="#7c5234" rx="8"/>
+      <ellipse cx="140" cy="232" rx="34" ry="18" fill="#59361e"/>
+      <text x="140" y="236" fill="#ffd966" font-size="11" text-anchor="middle" font-weight="bold">🔋</text>
+      <!-- Стебель / Пружина -->
+      <path id="stem" d="M 140 214 Q 140 120 200 85" stroke="#2d8a4e" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- Цветок с живым личиком -->
+      <g id="flowerGroup">
+        <path d="M 200 85 C 175 45, 160 65, 192 92 Z" fill="#ff66a3"/>
+        <path d="M 200 85 C 225 45, 240 65, 208 92 Z" fill="#ff4d94"/>
+        <path d="M 200 85 C 185 35, 215 35, 200 85 Z" fill="#ff85b8"/>
+        <circle cx="200" cy="94" r="16" fill="#ffe6f0" stroke="#d63384" stroke-width="2"/>
+        <!-- Глазки и улыбка -->
+        <circle cx="194" cy="91" r="2.5" fill="#2c3e50"/>
+        <circle cx="206" cy="91" r="2.5" fill="#2c3e50"/>
+        <path id="mouth" d="M 195 98 Q 200 102 205 98" stroke="#d63384" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- Семечко -->
+      <circle id="seed" cx="200" cy="94" r="5" fill="#f59f00" opacity="0"/>
+    </svg>
+    <div>
+      <button class="action-btn" onclick="activateSpring()" id="springBtn">🌀 Enrouler le ressort !</button>
+      <button class="action-btn" style="background:#6c757d;" onclick="resetSpring()" id="resetBtn">↺ Recommencer</button>
+    </div>
+    <div class="happy-msg" id="msg"></div>
+  </div>
+</div>
+
+<script>
+const data = {
+  fr: {
+    back: "← Retour au cours",
+    title: "Leçon 1 : Batteries souterraines et ressorts-coffres",
+    story: "Dans les montagnes, les fleurs comme le <b>Cyclamen</b> et le <b>Crocus</b> cachent sous la terre une véritable batterie remplie d'énergie ! Après la floraison, le cyclamen fait un tour de magie d'ingénieur : il enroule sa tige comme un ressort de montre pour déposer délicatement ses graines bien au chaud dans la terre.",
+    labTitle: "Expérience : Aide le Cyclamen à planter ses graines !",
+    springBtn: "🌀 Enrouler le ressort !",
+    resetBtn: "↺ Recommencer",
+    done: "Youpi ! Le Cyclamen saute de joie : ses graines sont bien protégées sous la terre !"
+  },
+  en: {
+    back: "← Back to course",
+    title: "Lesson 1: Underground Batteries & Spring Safes",
+    story: "High in the mountains, flowers like the <b>Cyclamen</b> and <b>Crocus</b> hide an energy-packed battery underground! After blooming, the cyclamen performs an engineering trick: it coils its stem like a watch spring to gently tuck its seeds safely into the warm soil.",
+    labTitle: "Experiment: Help the Cyclamen plant its seeds!",
+    springBtn: "🌀 Coil the spring!",
+    resetBtn: "↺ Reset",
+    done: "Yay! The Cyclamen jumps for joy: its seeds are safely tucked in the soil!"
+  },
+  ru: {
+    back: "← Назад к курсу",
+    title: "Урок 1: Подземные батарейки и пружины-сейфы",
+    story: "В горах цветы — такие как <b>Цикламен</b> и <b>Крокус</b> — прячут под землёй настоящую батарейку, полную сил! А после цветения цикламен показывает инженерный фокус: он скручивает свой стебель в тугую часовую пружинку, чтобы бережно опустить семена прямо в тёплую землю.",
+    labTitle: "Опыт: Помоги цикламену уложить семена в землю!",
+    springBtn: "🌀 Скрутить пружинку!",
+    resetBtn: "↺ Сначала",
+    done: "Ура! Цикламен прыгает от счастья: его зёрнышки надёжно спрятаны в тёплой земле!"
+  }
+};
+let cur = 'fr';
+function setLang(l) {
+  cur = l;
+  document.querySelectorAll('.lang-btns button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-'+l).classList.add('active');
+  document.getElementById('backTxt').innerText = data[l].back;
+  document.getElementById('title').innerText = data[l].title;
+  document.getElementById('story').innerHTML = data[l].story;
+  document.getElementById('labTitle').innerText = data[l].labTitle;
+  document.getElementById('springBtn').innerText = data[l].springBtn;
+  document.getElementById('resetBtn').innerText = data[l].resetBtn;
+  if(document.getElementById('msg').innerText) document.getElementById('msg').innerText = data[l].done;
+}
+function activateSpring() {
+  document.getElementById('stem').setAttribute('d', 'M 140 214 C 155 170, 195 170, 175 190 C 160 205, 215 185, 225 205');
+  const seed = document.getElementById('seed');
+  seed.setAttribute('opacity', '1');
+  seed.setAttribute('cx', '230');
+  seed.setAttribute('cy', '212');
+  document.getElementById('mouth').setAttribute('d', 'M 192 96 Q 200 107 208 96');
+  document.getElementById('flowerGroup').classList.add('celebrate');
+  document.getElementById('msg').innerText = data[cur].done;
+}
+function resetSpring() {
+  document.getElementById('stem').setAttribute('d', 'M 140 214 Q 140 120 200 85');
+  document.getElementById('seed').setAttribute('opacity', '0');
+  document.getElementById('mouth').setAttribute('d', 'M 195 98 Q 200 102 205 98');
+  document.getElementById('flowerGroup').classList.remove('celebrate');
+  document.getElementById('msg').innerText = '';
+}
+setLang('fr');
+</script>
+</body>
+</html>
